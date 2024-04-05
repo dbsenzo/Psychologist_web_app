@@ -26,7 +26,7 @@ app.get('/', (req, res) => {
 });
 
 app.get('/patients', (req, res) => {
-    var sql = 'SELECT IdPatient, Prenom, Nom, Adresse, MoyenDeConnaissance, Sexe, Profession, DateProfession FROM patient INNER JOIN profession ON patient.IdProfession = profession.IdProfession';
+    var sql = 'SELECT Prenom, Nom, Adresse, MoyenDeConnaissance, Sexe, Profession, DateProfession FROM patient INNER JOIN profession ON patient.IdProfession = profession.IdProfession';
     connection.query(sql, function (err, result) {
         if (err) {
           console.error('Erreur', err);
@@ -49,7 +49,7 @@ app.get('/patients/:id', (req, res) => {
   });
 });
 app.get('/consultations', (req, res) => {
-  var sql = 'SELECT idPatient, Prenom, Nom, Sexe, Profession, Creneaux, Retard, Prix, ModeDeReglement, IndicateurAnxiete, NombreDePersonnes, Observations'
+  var sql = 'SELECT Prenom, Nom, Sexe, Profession, Creneaux, Retard, Prix, ModeDeReglement, IndicateurAnxiete, NombreDePersonnes, Observations'
     + ' FROM patient INNER JOIN Consulter ON patient.IdPatient = consulter.IdPatient INNER JOIN Profession ON patient.IdProfession = profession.IdProfession INNER JOIN Calendrier ON consulter.IdCalendrier = calendrier.IdCalendrier';
     connection.query(sql, function (err, result) {
       console.log(result);
