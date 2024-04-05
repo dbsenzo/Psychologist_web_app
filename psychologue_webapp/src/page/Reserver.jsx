@@ -1,33 +1,32 @@
-import { useState } from "react";
-import { StepperComponent } from "../components/reservation/Stepper";
-import { ReserverCreneau } from "../components/reservation/ReseverCreneau";
-import { Box } from "@chakra-ui/react";
-import { InformationsPersonnel } from "../components/reservation/InformationsPersonnel";
+import { useDisclosure, Box, Text } from "@chakra-ui/react";
+import { ModalAjoutPatient } from "../components/reservation/ModalAjoutPatient";
+import { TableauDisplayUser } from "../components/DataGrids/TableauDisplayUser";
+import { useEffect, useState } from "react";
+import ClientsAPI from "../services/ClientsAPI";
+import { BreadcrumbCustom } from "../components/Dashboard_Box/Breadcrumb";
+import { BoxOne } from "../components/Dashboard_Box/Box1";
 
 export function Reserver() {
-    // Création d'un état pour stocker les créneaux disponibles
-    const [step, setStep] = useState(1);
+    const { isOpen, onOpen, onClose } = useDisclosure();
+    const [patientsObject, setPatientsObject] = useState([]);
 
-    const displayStep = (step) => {
-        switch (step){
-            case 1:
-                return <InformationsPersonnel step={step} setStep={setStep}/>
-            case 2:
-                return <ReserverCreneau setStep={setStep} step={step}/>
-            case 3:
-                return //
-
-        }
+    const fetchPatientsObject = async () => {
+        setPatientsObject(await ClientsAPI.getClients());
     }
-
+    
+    useEffect(() => {
+        fetchPatientsObject();
+    }, [])
     
     return (
         <>
-            <Box display={'flex'} justifyContent={'center'}>
-                    <Box width={'80%'} display={'flex'} flexDirection={'column'} gap={'50px'}>
-                        <StepperComponent step={step}/>
-                        {displayStep(step)}
-                    </Box>
+            <Box as="div" display={"flex"} flexDirection={"column"} width={"100%"} marginInline={'10px'} gap={"20px"}>
+                <Box margin={"20px 0px 40px 0px"}>
+                    <BreadcrumbCustom actualPage={"Patients"}/>
+                    <Text fontWeight={600}>Patients</Text>
+                </Box>
+                <ModalAjoutPatient isOpen={isOpen} onClose={onClose}/>  
+                <BoxOne width={"100%"} component={<TableauDisplayUser patients={patientsObject} editOnClick={onOpen} deleteOnClick={onOpen}/>}/>
             </Box>
         </>
     );

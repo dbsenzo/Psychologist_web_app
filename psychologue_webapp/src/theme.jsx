@@ -13,9 +13,9 @@ const theme = extendTheme({
       },
   // 1. Vous pouvez toujours définir les couleurs primaires et secondaires si vous le souhaitez
   colors: {
-    primary: '#ffc83e', // Exemple de couleur primaire
-    secondary: '#F8D57E', // Exemple de couleur secondaire
-    buttonBackground: '#F8D57E', // Définition de la couleur spécifique des boutons
+    primary: 'rgba(75,192,192,0.5)', // Exemple de couleur primaire
+    secondary: 'rgba(75,192,192,0.15)', // Exemple de couleur secondaire
+    buttonBackground: 'rgba(75,192,192,1)', // Définition de la couleur spécifique des boutons
   },
   components: {
     Text: {
@@ -23,6 +23,64 @@ const theme = extendTheme({
             color: 'black'
         }
 
+    },
+    Li: { // Ajout d'un composant personnalisé `Li` à la configuration du thème
+      // Styles pour l'état non actif
+      baseStyle: {
+        display: 'flex',
+        gap: '10px',
+        width: "80%",
+        background: "transparent",
+        borderRadius: "12px",
+        padding: '5px',
+        cursor: 'pointer',
+        image: {
+          color: "currentColor",
+          background: "white",
+          padding: "5px",
+          borderRadius: "10px",
+          boxShadow: "0px 3.5px 5.5px 0px rgba(0, 0, 0, 0.02)"
+
+        },
+        text: {
+          color: "#718096",
+          fontSize: 'large',
+          fontWeight: 500,
+        }
+      },
+      // Styles pour l'état actif
+      variants: {
+        active: {
+          bg: "white",
+          padding: "15px",
+          boxShadow: "0px 5px 3.5px 0px rgba(0, 0, 0, 0.02)",
+          cursor: 'unset',
+          image: {
+            backgroundColor: "White",
+            boxShadow: "none"
+
+          },
+          text: {
+            color: "black",
+          }
+        }
+      }
+    },
+    Table: {
+      variants: {
+        striped: { // Utilisation de 'striped' au lieu de 'main' pour correspondre à votre demande
+          th: {
+            bg: 'white',
+          },
+          tbody: {
+            tr: {
+              '&:nth-of-type(odd)': {
+                backgroundColor: 'secondary', // Utilisez cette configuration pour les lignes zébrées
+              },
+            },
+          },
+        },
+      },
     },
     Button: {
       baseStyle: {
@@ -37,14 +95,14 @@ const theme = extendTheme({
           bg: 'primary', // Utilisation de la couleur définie dans 'colors'
           color: 'black', // Couleur du texte sur le bouton
           _hover: {
-            bg: 'primary', // Couleur au survol (exemple)
+            bg: 'buttonBackground', // Couleur au survol (exemple)
           },
         },
         secondary: {
             bg: 'secondary', // Utilisation de la couleur définie dans 'colors'
             color: 'black', // Couleur du texte sur le bouton
             _hover: {
-              bg: 'secondary', // Couleur au survol (exemple)
+              bg: 'primary', // Couleur au survol (exemple)
             },
           },
       },

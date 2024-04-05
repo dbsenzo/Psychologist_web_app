@@ -4,7 +4,7 @@ import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import AppointmentsAPI from '../../services/AppointmentsAPI';
 import moment from 'moment'; // Import moment
-import { Box } from '@chakra-ui/react';
+import { Box, Text } from '@chakra-ui/react';
 import { useEffect, useState } from 'react';
 
 
@@ -63,7 +63,8 @@ export function Calendar() {
   }
 
   return (
-    <Box as='div'>
+    <Box as='div' display={'flex'} flexDirection={'column'} gap={"20px"}>
+      <Text fontSize={"24px"} fontWeight={600}>Mon calendrier</Text>
       <FullCalendar
         // editable
         // eventDragStop={(data) => console.log(data.event._instance.range)}
