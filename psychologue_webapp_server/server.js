@@ -75,7 +75,7 @@ app.get('/creneaux/libres', (req, res) => {
 });
 
 app.get('/creneaux/moisn-1', (req, res) => {
-  var sql = "SELECT CONCAT(patient.Nom,' ', SUBSTRING(patient.Prenom,1,1), '.') AS Titre, Creneaux FROM calendrier INNER JOIN consulter ON calendrier.IdCalendrier = consulter.IdCalendrier INNER JOIN patient ON consulter.IdPatient = patient.IdPatient WHERE MONTH(calendrier.Creneaux) = MONTH(CURRENT_DATE)-1;";
+  var sql = "SELECT * FROM resamoisprecedent";
   connection.query(sql, function (err, result) {
     if (err) {
       console.error('Erreur', err);
@@ -87,11 +87,23 @@ app.get('/creneaux/moisn-1', (req, res) => {
 });
 
 app.get('/creneaux/moisn', (req, res) => {
-  var sql = "SELECT CONCAT(patient.Nom,' ', SUBSTRING(patient.Prenom,1,1), '.') AS Titre, Creneaux FROM calendrier INNER JOIN consulter ON calendrier.IdCalendrier = consulter.IdCalendrier INNER JOIN patient ON consulter.IdPatient = patient.IdPatient WHERE MONTH(calendrier.Creneaux) = MONTH(CURRENT_DATE);";
+  var sql = "SELECT * FROM resamoisactuel";
   connection.query(sql, function (err, result) {
     if (err) {
       console.error('Erreur', err);
       res.status(500).send('Erreur lors de la récupération des Creneaux du mois en cours');
+      return;
+    }
+    res.send(result);
+  });
+});
+
+app.get('/creneaux/all', (req, res) => {
+  var sql = "SELECT * FROM allresa";
+  connection.query(sql, function (err, result) {
+    if (err) {
+      console.error('Erreur', err);
+      res.status(500).send('Erreur lors de la récupération des Creneaux');
       return;
     }
     res.send(result);
@@ -122,7 +134,16 @@ app.get('/graph/resa', (req, res) => {
   });
 });
 
-
-
+app.get('/graph/patient', (req, res) => {
+  var sql = 'SELECT (((SELECT COUNT(IdPatient) FROM patientmoisactuel) * 100) / COUNT(IdPatient)) - 100 AS Pourcentage FROM patientmoisprecedent;';
+  connection.query(sql, function (err, result) {
+    if (err) {
+      console.error('Erreur', err);
+      res.status(500).send('Erreur lors de la récupération des Creneaux');
+      return;
+    }
+    res.send(result);
+  });
+});
 
 app.listen(3000, () => console.log('Example app is listening on port 3000.'));
