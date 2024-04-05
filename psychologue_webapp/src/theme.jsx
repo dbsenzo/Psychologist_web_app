@@ -4,6 +4,7 @@ import { extendTheme } from '@chakra-ui/react'
 // Définition du thème personnalisé
 const theme = extendTheme({
     styles: {
+        // eslint-disable-next-line no-unused-vars
         global: (props) => ({
           body: {
             bg: "#F8F9FA",

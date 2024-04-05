@@ -9,8 +9,8 @@ export function ChartClient({chartName, pourcentage}) {
 
   const getPourcentageColor = () => {
     return pourcentage > 0
-      ? { pourcentage: pourcentage, sign: "+", color: 'green' }
-      : { pourcentage: Math.abs(pourcentage), sign: "-", color: 'red' }; // Make sure pourcentage is always positive here
+      ? { pourcentage: pourcentage, sign: "+", color: 'green', data: [5,3,11] }
+      : { pourcentage: Math.abs(pourcentage), sign: "-", color: 'red', data: [11,3,5] }; // Make sure pourcentage is always positive here
   }
 
   const pourcentageObject = getPourcentageColor();
@@ -52,6 +52,7 @@ export function ChartClient({chartName, pourcentage}) {
         datalabels: {
             display: false
         },
+      
       },
     scales: {
         x: { // Hides the x-axis labels
@@ -68,6 +69,11 @@ export function ChartClient({chartName, pourcentage}) {
             }
           },
     },
+    elements: {
+      point: {
+        radius: 0 // Hides the points on the line
+      }
+    },
   };
 
   const chartData = {
@@ -82,7 +88,7 @@ export function ChartClient({chartName, pourcentage}) {
         pointBorderColor: '#fff',
         pointHoverBackgroundColor: '#fff',
         pointHoverBorderColor: 'rgba(179,181,198,1)',
-        data: [5, 3, 11] // Simplified for readability
+        data: pourcentageObject.data // Simplified for readability
       }
     ]
   };

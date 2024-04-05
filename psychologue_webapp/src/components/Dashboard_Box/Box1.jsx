@@ -1,4 +1,6 @@
 import { Box } from "@chakra-ui/react"
+import PropTypes from "prop-types";
+
 export function BoxOne({width, height="unset", background="white", component}){
     
     return(
@@ -7,3 +9,10 @@ export function BoxOne({width, height="unset", background="white", component}){
         </Box>
     )
 }
+
+BoxOne.propTypes = {
+  width: PropTypes.string.isRequired,
+  height: PropTypes.string,
+  background: PropTypes.string,
+  component: PropTypes.node.isRequired,
+};

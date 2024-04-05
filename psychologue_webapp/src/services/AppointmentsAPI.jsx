@@ -1,6 +1,6 @@
 class AppointmentsAPI {
     static getAppointments() {
-        return fetch('http://localhost:3000/consultations')
+        return fetch('http://localhost:3000/creneaux/all')
             .then(response => {
                 if (!response.ok) {
                     throw new Error("HTTP error " + response.status);
@@ -11,7 +11,7 @@ class AppointmentsAPI {
                 return data;
             })
             .catch(function() {
-                this.setState({ errorMessage: 'Unable to load data, server may be down.' });
+                console.log('Unable to load data, server may be down.') 
             });
     }
 }

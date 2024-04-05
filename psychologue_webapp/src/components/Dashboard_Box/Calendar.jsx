@@ -3,6 +3,7 @@ import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import AppointmentsAPI from '../../services/AppointmentsAPI';
+import moment from 'moment'; // Import moment
 import { Box } from '@chakra-ui/react';
 import { useEffect, useState } from 'react';
 
@@ -11,12 +12,19 @@ export function Calendar() {
 
   const [events, setEvents] = useState([]);
 
+  const highlightCurrentDay = ({ date, el }) => {
+    if (moment().isSame(date, 'day')) {
+      el.style.backgroundColor = 'rgba(75,192,192,0.15)'; // Change to your preferred color
+    }
+  };
+
   const fetchEvents = async () => {
-    let eventsTemp = await AppointmentsAPI.getAppointments();
-    setEvents(eventsTemp.map((event, index) => ({
-      title: index,
-      start: event.Creneaux,
-    })));
+    // let eventsTemp = await AppointmentsAPI.getAppointments();
+    // setEvents(eventsTemp.map((event, index) => ({
+    //   title: String(index),
+    //   start: event.Creneaux,
+    // })));
+    setEvents(await AppointmentsAPI.getAppointments());
   }
   useEffect(() => {
     fetchEvents();
@@ -54,8 +62,7 @@ export function Calendar() {
   function renderEventContent(eventInfo) {
     return (
       <>
-        <b>{eventInfo.timeText}</b>
-        <i>{eventInfo.event.title}</i>
+        <p><b>{eventInfo.timeText}</b> | <i>{eventInfo.event.title}</i></p>
       </>
     );
   }
@@ -63,8 +70,9 @@ export function Calendar() {
   return (
     <Box as='div'>
       <FullCalendar
-        editable
-        eventDragStop={(data) => console.log(data.event._instance.range)}
+        // editable
+        // eventDragStop={(data) => console.log(data.event._instance.range)}
+        dayCellDidMount={highlightCurrentDay}
         allDaySlot={false}
         plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
         slotMinTime={"08:00:00"}
