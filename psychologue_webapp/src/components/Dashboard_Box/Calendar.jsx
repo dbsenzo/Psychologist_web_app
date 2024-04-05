@@ -19,11 +19,6 @@ export function Calendar() {
   };
 
   const fetchEvents = async () => {
-    // let eventsTemp = await AppointmentsAPI.getAppointments();
-    // setEvents(eventsTemp.map((event, index) => ({
-    //   title: String(index),
-    //   start: event.Creneaux,
-    // })));
     setEvents(await AppointmentsAPI.getAppointments());
   }
   useEffect(() => {
@@ -80,7 +75,8 @@ export function Calendar() {
         slotDuration={"00:30:00"}
         initialView='timeGridWeek'
         eventDurationEditable={false}
-        weekends={false}
+        // weekends={false}
+        hiddenDays={[0]}
         locale={'fr'}
         events={events}
         aspectRatio={2}
