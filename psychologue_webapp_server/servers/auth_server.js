@@ -1,30 +1,7 @@
 const express = require('express');
-const mysql = require('mysql');
-const cors = require('cors');
-const bcrypt = require('bcrypt');
-const saltRounds = 10; 
+const router = express.Router();
 
-const app = express();
-app.use(cors())
-app.use(express.json());
-
-
-var connection = mysql.createConnection({  
-  host  :'localhost',
-  user  :'root',
-  password  :'',
-  database: 'psychologue'
-});
-
-connection.connect((err) => {
-  if (err) {
-      throw err;
-  } else {
-      console.log('MySQL connected!');
-  }
-});
-
-app.post('/auth/login', (req, res) => {
+router.post('/login', (req, res) => {
   const { username, password } = req.body;
   // Query to find the user by username only
   var sql = 'SELECT * FROM accounts WHERE username = ?';
@@ -54,7 +31,7 @@ app.post('/auth/login', (req, res) => {
   });
 });
 
-app.post('/auth/signup', (req, res) => {
+router.post('/signup', (req, res) => {
   const { username, password } = req.body;
   // First, check if the user already exists
   var sqlCheck = 'SELECT username FROM accounts WHERE username = ?';
@@ -90,4 +67,4 @@ app.post('/auth/signup', (req, res) => {
   });
 });
 
-app.listen(3000, () => console.log('Example app is listening on port 3000.'));
+module.exports = router;

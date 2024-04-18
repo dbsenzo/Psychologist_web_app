@@ -1,31 +1,8 @@
 const express = require('express');
-const mysql = require('mysql');
-const cors = require('cors');
-const bcrypt = require('bcrypt');
-const saltRounds = 10; 
-
-const app = express();
-app.use(cors())
-app.use(express.json());
-
-var connection = mysql.createConnection({  
-    host  :'localhost',
-    user  :'root',
-    password  :'',
-    database: 'psychologue'
-  });
-
-connection.connect((err) => {
-    if (err) {
-        throw err;
-    } else {
-        console.log('MySQL connected!');
-    }
-  });
+const router = express.Router();
 
 // GET
-
-app.get('/patients', (req, res) => {
+router.get('/', (req, res) => {
     var sql = 'SELECT Prenom, Nom, Adresse, MoyenDeConnaissance, Sexe, Profession, DateProfession FROM patient INNER JOIN profession ON patient.IdProfession = profession.IdProfession';
     connection.query(sql, function (err, result) {
         if (err) {
@@ -37,7 +14,7 @@ app.get('/patients', (req, res) => {
     });
 });
 
-app.get('/patients/:id', (req, res) => {
+router.get('/:id', (req, res) => {
     var sql = 'SELECT IdPatient, Prenom, Nom, Adresse, MoyenDeConnaissance, Sexe, Profession, DateProfession FROM patient INNER JOIN profession ON patient.IdProfession = profession.IdProfession WHERE IdPatient = ?';
     connection.query(sql, [req.params.id], function (err, result) {
         if (err) {
@@ -49,7 +26,7 @@ app.get('/patients/:id', (req, res) => {
     });
 });
 
-app.post('/patiens/add', (req, res) => {
+router.post('/add', (req, res) => {
     const { Prenom, Nom, Adresse, MoyenDeConnaissance, Sexe, Profession, DateProfession } = req.body;
     var sql = 'INSERT INTO patient (Prenom, Nom, Adresse, MoyenDeConnaissance, Sexe, IdProfession, DateProfession) VALUES (?, ?, ?, ?, ?, ?, ?)';
     connection.query(sql, [Prenom, Nom, Adresse, MoyenDeConnaissance, Sexe, Profession, DateProfession], function (err, result) {
@@ -62,7 +39,7 @@ app.post('/patiens/add', (req, res) => {
     });
 });
 
-app.put('/patients/update/:id', (req, res) => {
+router.put('/update/:id', (req, res) => {
     const { Prenom, Nom, Adresse, MoyenDeConnaissance, Sexe, Profession } = req.body;
     var sql = 'UPDATE patient SET Prenom = ?, Nom = ?, Adresse = ?, MoyenDeConnaissance = ?, Sexe = ?, IdProfession = ?, DateProfession = ? WHERE IdPatient = ?';
     connection.query(sql, [Prenom, Nom, Adresse, MoyenDeConnaissance, Sexe, Profession, req.params.id], function (err, result) {
@@ -75,7 +52,7 @@ app.put('/patients/update/:id', (req, res) => {
     });
 });
 
-app.delete('/patients/delete/:id', (req, res) => {
+router.delete('/delete/:id', (req, res) => {
     var sql = 'DELETE FROM patient WHERE IdPatient = ?';
     connection.query(sql, [req.params.id], function (err, result) {
         if (err) {
@@ -87,4 +64,4 @@ app.delete('/patients/delete/:id', (req, res) => {
     });
 });
 
-app.listen(3000, () => console.log('Example app is listening on port 3000.'));
+module.exports = router;

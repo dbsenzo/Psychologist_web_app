@@ -1,31 +1,7 @@
 const express = require('express');
-const mysql = require('mysql');
-const cors = require('cors');
-const bcrypt = require('bcrypt');
-const saltRounds = 10; 
+const router = express.Router();
 
-const app = express();
-app.use(cors())
-app.use(express.json());
-
-
-var connection = mysql.createConnection({  
-  host  :'localhost',
-  user  :'root',
-  password  :'',
-  database: 'psychologue'
-});
-
-connection.connect((err) => {
-  if (err) {
-      throw err;
-  } else {
-      console.log('MySQL connected!');
-  }
-});
-
-
-app.get('/creneaux/libres', (req, res) => {
+router.get('/libres', (req, res) => {
     var sql = 'SELECT Creneaux FROM Calendrier WHERE IdCalendrier NOT IN (SELECT IdCalendrier FROM consulter)';
     connection.query(sql, function (err, result) {
       if (err) {
@@ -37,7 +13,7 @@ app.get('/creneaux/libres', (req, res) => {
     });
 });
   
-app.get('/creneaux/moisn-1', (req, res) => {
+router.get('/moisn-1', (req, res) => {
     var sql = "SELECT * FROM resamoisprecedent";
     connection.query(sql, function (err, result) {
       if (err) {
@@ -49,7 +25,7 @@ app.get('/creneaux/moisn-1', (req, res) => {
     });
 });
   
-app.get('/creneaux/moisn', (req, res) => {
+router.get('/moisn', (req, res) => {
     var sql = "SELECT * FROM resamoisactuel";
     connection.query(sql, function (err, result) {
       if (err) {
@@ -61,7 +37,7 @@ app.get('/creneaux/moisn', (req, res) => {
     });
 });
   
-app.get('/creneaux/all', (req, res) => {
+router.get('/all', (req, res) => {
     var sql = "SELECT * FROM allresa";
     connection.query(sql, function (err, result) {
       if (err) {
@@ -73,7 +49,7 @@ app.get('/creneaux/all', (req, res) => {
     });
 });
   
-app.get('/creneaux', (req, res) => {
+router.get('/', (req, res) => {
     var sql = 'SELECT Creneaux FROM calendrier';
     connection.query(sql, function (err, result) {
       if (err) {
@@ -85,7 +61,7 @@ app.get('/creneaux', (req, res) => {
     });
 });
 
-app.post('/creneaux/add', (req, res) => {
+router.post('/add', (req, res) => {
     const formData = req.body;
     console.log(formData);
 
@@ -100,7 +76,7 @@ app.post('/creneaux/add', (req, res) => {
     });
 });
 
-app.put('/creneaux/update/:id', (req, res) => {
+router.put('/update/:id', (req, res) => {
     const idCreneau = req.params.id;
     const formData = req.body;
     console.log(formData);
@@ -117,7 +93,7 @@ app.put('/creneaux/update/:id', (req, res) => {
     });
 });
 
-app.delete('/creneaux/delete/:id', (req, res) => {
+router.delete('/delete/:id', (req, res) => {
     const idCreneau = req.params.id;
     console.log(idCreneau);
 
@@ -132,4 +108,4 @@ app.delete('/creneaux/delete/:id', (req, res) => {
     });
 });
 
-app.listen(3000, () => console.log('Example app is listening on port 3000.'));
+module.exports = router;
