@@ -4,7 +4,7 @@ const router = express.Router();
 // GET
 router.get('/', (req, res) => {
     var sql = 'SELECT Prenom, Nom, Adresse, MoyenDeConnaissance, Sexe, Profession, DateProfession FROM patient INNER JOIN profession ON patient.IdProfession = profession.IdProfession';
-    connection.query(sql, function (err, result) {
+    req.connection.query(sql, function (err, result) {
         if (err) {
             console.error('Erreur', err);
             res.status(500).send('Erreur lors de la récupération des patients.');
@@ -16,7 +16,7 @@ router.get('/', (req, res) => {
 
 router.get('/:id', (req, res) => {
     var sql = 'SELECT IdPatient, Prenom, Nom, Adresse, MoyenDeConnaissance, Sexe, Profession, DateProfession FROM patient INNER JOIN profession ON patient.IdProfession = profession.IdProfession WHERE IdPatient = ?';
-    connection.query(sql, [req.params.id], function (err, result) {
+    req.connection.query(sql, [req.params.id], function (err, result) {
         if (err) {
           console.error('Erreur', err);
           res.status(500).send('Erreur lors de la récupération du patient.');
@@ -29,7 +29,7 @@ router.get('/:id', (req, res) => {
 router.post('/add', (req, res) => {
     const { Prenom, Nom, Adresse, MoyenDeConnaissance, Sexe, Profession, DateProfession } = req.body;
     var sql = 'INSERT INTO patient (Prenom, Nom, Adresse, MoyenDeConnaissance, Sexe, IdProfession, DateProfession) VALUES (?, ?, ?, ?, ?, ?, ?)';
-    connection.query(sql, [Prenom, Nom, Adresse, MoyenDeConnaissance, Sexe, Profession, DateProfession], function (err, result) {
+    req.connection.query(sql, [Prenom, Nom, Adresse, MoyenDeConnaissance, Sexe, Profession, DateProfession], function (err, result) {
       if (err) {
         console.error('Erreur', err);
         res.status(500).send('Erreur lors de l\'ajout du patient');
@@ -42,7 +42,7 @@ router.post('/add', (req, res) => {
 router.put('/update/:id', (req, res) => {
     const { Prenom, Nom, Adresse, MoyenDeConnaissance, Sexe, Profession } = req.body;
     var sql = 'UPDATE patient SET Prenom = ?, Nom = ?, Adresse = ?, MoyenDeConnaissance = ?, Sexe = ?, IdProfession = ?, DateProfession = ? WHERE IdPatient = ?';
-    connection.query(sql, [Prenom, Nom, Adresse, MoyenDeConnaissance, Sexe, Profession, req.params.id], function (err, result) {
+    req.connection.query(sql, [Prenom, Nom, Adresse, MoyenDeConnaissance, Sexe, Profession, req.params.id], function (err, result) {
         if (err) {
           console.error('Erreur', err);
           res.status(500).send('Erreur lors de la modification du patient');
@@ -54,7 +54,7 @@ router.put('/update/:id', (req, res) => {
 
 router.delete('/delete/:id', (req, res) => {
     var sql = 'DELETE FROM patient WHERE IdPatient = ?';
-    connection.query(sql, [req.params.id], function (err, result) {
+    req.connection.query(sql, [req.params.id], function (err, result) {
         if (err) {
           console.error('Erreur', err);
           res.status(500).send('Erreur lors de la suppression du patient');

@@ -3,7 +3,7 @@ const router = express.Router();
 
 router.get('/libres', (req, res) => {
     var sql = 'SELECT Creneaux FROM Calendrier WHERE IdCalendrier NOT IN (SELECT IdCalendrier FROM consulter)';
-    connection.query(sql, function (err, result) {
+    req.connection.query(sql, function (err, result) {
       if (err) {
         console.error('Erreur', err);
         res.status(500).send('Erreur lors de la récupération des Creneaux libres');
@@ -15,7 +15,7 @@ router.get('/libres', (req, res) => {
   
 router.get('/moisn-1', (req, res) => {
     var sql = "SELECT * FROM resamoisprecedent";
-    connection.query(sql, function (err, result) {
+    req.connection.query(sql, function (err, result) {
       if (err) {
         console.error('Erreur', err);
         res.status(500).send('Erreur lors de la récupération des Creneaux du mois précédent');
@@ -27,7 +27,7 @@ router.get('/moisn-1', (req, res) => {
   
 router.get('/moisn', (req, res) => {
     var sql = "SELECT * FROM resamoisactuel";
-    connection.query(sql, function (err, result) {
+    req.connection.query(sql, function (err, result) {
       if (err) {
         console.error('Erreur', err);
         res.status(500).send('Erreur lors de la récupération des Creneaux du mois en cours');
@@ -39,7 +39,7 @@ router.get('/moisn', (req, res) => {
   
 router.get('/all', (req, res) => {
     var sql = "SELECT * FROM allresa";
-    connection.query(sql, function (err, result) {
+    req.connection.query(sql, function (err, result) {
       if (err) {
         console.error('Erreur', err);
         res.status(500).send('Erreur lors de la récupération des Creneaux');
@@ -51,7 +51,7 @@ router.get('/all', (req, res) => {
   
 router.get('/', (req, res) => {
     var sql = 'SELECT Creneaux FROM calendrier';
-    connection.query(sql, function (err, result) {
+    req.connection.query(sql, function (err, result) {
       if (err) {
         console.error('Erreur', err);
         res.status(500).send('Erreur lors de la récupération des Creneaux');
@@ -66,7 +66,7 @@ router.post('/add', (req, res) => {
     console.log(formData);
 
     var sql = 'INSERT INTO calendrier SET ?';
-    connection.query(sql, formData, function (err, result) {
+    req.connection.query(sql, formData, function (err, result) {
       if (err) {
         console.error('Erreur', err);
         res.status(500).send('Erreur lors de l\'ajout du Creneau');
@@ -83,7 +83,7 @@ router.put('/update/:id', (req, res) => {
     console.log(idCreneau);
 
     var sql = 'UPDATE calendrier SET ? WHERE IdCalendrier = ?';
-    connection.query(sql, [formData, idCreneau], function (err, result) {
+    req.connection.query(sql, [formData, idCreneau], function (err, result) {
         if (err) {
           console.error('Erreur', err);
           res.status(500).send('Erreur lors de la modification du Creneau');
@@ -98,7 +98,7 @@ router.delete('/delete/:id', (req, res) => {
     console.log(idCreneau);
 
     var sql = 'DELETE FROM calendrier WHERE IdCalendrier = ?';
-    connection.query(sql, [idCreneau], function (err, result) {
+    req.connection.query(sql, [idCreneau], function (err, result) {
         if (err) {
           console.error('Erreur', err);
           res.status(500).send('Erreur lors de la suppression du Creneau');

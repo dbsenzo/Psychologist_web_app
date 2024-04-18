@@ -21,6 +21,11 @@ var connection = mysql.createConnection({
   database: 'psychologue'
 });
 
+app.use((req, res, next) => {
+  req.connection = connection;
+  next();
+});
+
 connection.connect((err) => {
   if (err) {
       throw err;

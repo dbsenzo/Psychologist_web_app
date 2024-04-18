@@ -5,7 +5,7 @@ router.post('/login', (req, res) => {
   const { username, password } = req.body;
   // Query to find the user by username only
   var sql = 'SELECT * FROM accounts WHERE username = ?';
-  connection.query(sql, [username], function (err, result) {
+  req.connection.query(sql, [username], function (err, result) {
     if (err) {
       console.error('Error', err);
       res.status(500).send('Error during the connection');
@@ -35,7 +35,7 @@ router.post('/signup', (req, res) => {
   const { username, password } = req.body;
   // First, check if the user already exists
   var sqlCheck = 'SELECT username FROM accounts WHERE username = ?';
-  connection.query(sqlCheck, [username], function (err, result) {
+  req.connection.query(sqlCheck, [username], function (err, result) {
     if (err) {
       console.error('Error checking user existence', err);
       res.status(500).send('Error during signup process');
@@ -55,7 +55,7 @@ router.post('/signup', (req, res) => {
       }
 
       var sqlInsert = 'INSERT INTO accounts (username, password) VALUES (?, ?)';
-      connection.query(sqlInsert, [username, hashedPassword], function (err, result) {
+      req.connection.query(sqlInsert, [username, hashedPassword], function (err, result) {
         if (err) {
           console.error('Error inserting user', err);
           res.status(500).send('Error during signup process');
