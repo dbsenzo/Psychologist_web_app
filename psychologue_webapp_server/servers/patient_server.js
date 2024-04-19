@@ -36,14 +36,6 @@ router.post('/add', (req, res) => {
   var sql = 'INSERT INTO patient (IdPatient, Prenom, Nom, Adresse, MoyenDeConnaissance, Sexe, IdProfession) VALUES (?, ?, ?, ?, ?, ?, ?)';
   var dateProfession = new Date();
 
-  req.connection.query(sqlCompte, [nom + prenom, nom + prenom , id, 0], function (err, result) {
-    if (err) {
-      console.error('Erreur', err);
-      res.status(500).send('Erreur lors de l\'ajout du compte ', err);
-      return;
-    }
-  });
-
 
   req.connection.query(sqlProf, [idProf, profession, dateProfession], function (err, result) {
     if (err) {
@@ -61,6 +53,14 @@ router.post('/add', (req, res) => {
     }
     res.send({ message: 'Patient ajouté avec succès' });
   });
+});
+
+req.connection.query(sqlCompte, [nom + prenom, nom + prenom , id, 0], function (err, result) {
+  if (err) {
+    console.error('Erreur', err);
+    res.status(500).send('Erreur lors de l\'ajout du compte ', err);
+    return;
+  }
 });
 
 router.put('/update/:id', (req, res) => {
