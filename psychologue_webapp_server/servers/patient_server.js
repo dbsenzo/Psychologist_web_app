@@ -27,16 +27,17 @@ router.get('/:id', (req, res) => {
 });
 
 router.post('/add', (req, res) => {
-    const { Prenom, Nom, Adresse, MoyenDeConnaissance, Sexe, Profession, DateProfession } = req.body;
-    var sql = 'INSERT INTO patient (Prenom, Nom, Adresse, MoyenDeConnaissance, Sexe, IdProfession, DateProfession) VALUES (?, ?, ?, ?, ?, ?, ?)';
-    req.connection.query(sql, [Prenom, Nom, Adresse, MoyenDeConnaissance, Sexe, Profession, DateProfession], function (err, result) {
-      if (err) {
-        console.error('Erreur', err);
-        res.status(500).send('Erreur lors de l\'ajout du patient');
-        return;
-      }
-      res.send({ message: 'Patient ajouté avec succès' });
-    });
+  const { prenom, nom, adresse, moyenDeConnaissance, sexe, profession } = req.body;
+  var sql = 'INSERT INTO patient (Prenom, Nom, Adresse, MoyenDeConnaissance, Sexe, IdProfession, DateProfession) VALUES (?, ?, ?, ?, ?, ?, ?)';
+  var dateProfession = new Date();
+  req.connection.query(sql, [prenom, nom, adresse, moyenDeConnaissance, sexe, profession, dateProfession], function (err, result) {
+    if (err) {
+      console.error('Erreur', err);
+      res.status(500).send('Erreur lors de l\'ajout du patient ', err);
+      return;
+    }
+    res.send({ message: 'Patient ajouté avec succès' });
+  });
 });
 
 router.put('/update/:id', (req, res) => {

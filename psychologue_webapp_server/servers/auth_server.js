@@ -1,22 +1,28 @@
 const express = require('express');
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 const router = express.Router();
 
+const secretKey = 'sercret_very_secret';
+const saltRounds = 10;
+
+// Login route
 router.post('/login', (req, res) => {
   const { username, password } = req.body;
   // Query to find the user by username only
-  var sql = 'SELECT * FROM accounts WHERE username = ?';
-  req.connection.query(sql, [username], function (err, result) {
+  req.connection.query('SELECT * FROM accounts WHERE username = ?', [username], function (err, results) {
     if (err) {
       console.error('Error', err);
       res.status(500).send('Error during the connection');
       return;
     }
-    if (result.length === 0) {
+    if (results.length === 0) {
       res.status(401).send('User not found');
       return;
     }
+    const user = results[0];
     // Compare password with hashed password stored in the database
-    bcrypt.compare(password, result[0].password, function(err, isMatch) {
+    bcrypt.compare(password, user.password, function(err, isMatch) {
       if (err) {
         res.status(500).send('Authentication error');
         return;
@@ -25,23 +31,25 @@ router.post('/login', (req, res) => {
         res.status(401).send('Invalid credentials');
         return;
       }
-      // Send a success message or token etc. Never send the password back!
-      res.send({ message: 'Login successful' });
+      // If credentials are correct, create a JWT
+      const token = jwt.sign({ id: user.id, username: user.username, isAdmin: user.isAdmin }, secretKey, { expiresIn: '1h' });
+      res.send({ message: 'Login successful', token: token });
     });
   });
 });
 
+// Signup route
 router.post('/signup', (req, res) => {
   const { username, password } = req.body;
+  console.log(req.body);
   // First, check if the user already exists
-  var sqlCheck = 'SELECT username FROM accounts WHERE username = ?';
-  req.connection.query(sqlCheck, [username], function (err, result) {
+  req.connection.query('SELECT username FROM accounts WHERE username = ?', [username], function (err, results) {
     if (err) {
       console.error('Error checking user existence', err);
       res.status(500).send('Error during signup process');
       return;
     }
-    if (result.length > 0) {
+    if (results.length > 0) {
       res.status(409).send('User already exists');
       return;
     }
@@ -54,8 +62,7 @@ router.post('/signup', (req, res) => {
         return;
       }
 
-      var sqlInsert = 'INSERT INTO accounts (username, password) VALUES (?, ?)';
-      req.connection.query(sqlInsert, [username, hashedPassword], function (err, result) {
+      req.connection.query('INSERT INTO accounts (username, password, id_patient, isAdmin) VALUES (?, ?, ?, ?)', [username, hashedPassword, 1, 0], function (err, result) {
         if (err) {
           console.error('Error inserting user', err);
           res.status(500).send('Error during signup process');
