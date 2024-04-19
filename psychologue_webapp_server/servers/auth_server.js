@@ -22,8 +22,9 @@ router.post('/login', (req, res) => {
     }
     const user = results[0];
     // Compare password with hashed password stored in the database
-    bcrypt.compare(password, user.password, function(err, isMatch) {
+    bcrypt.compare(password, user.pass, function(err, isMatch) {
       if (err) {
+        console.log(err)
         res.status(500).send('Authentication error');
         return;
       }
@@ -62,7 +63,7 @@ router.post('/signup', (req, res) => {
         return;
       }
 
-      req.connection.query('INSERT INTO accounts (username, password, id_patient, isAdmin) VALUES (?, ?, ?, ?)', [username, hashedPassword, 1, 0], function (err, result) {
+      req.connection.query('INSERT INTO accounts (username, pass, idPatient, isAdmin) VALUES (?, ?, ?, ?)', [username, hashedPassword, 1, 0], function (err, result) {
         if (err) {
           console.error('Error inserting user', err);
           res.status(500).send('Error during signup process');

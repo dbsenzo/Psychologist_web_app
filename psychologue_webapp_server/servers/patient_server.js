@@ -1,5 +1,4 @@
-import { v4 as uuidv4 } from 'uuid';
-
+const { v4: uuidv4 } = require('uuid');
 const express = require('express');
 const router = express.Router();
 
@@ -31,7 +30,7 @@ router.get('/:id', (req, res) => {
 router.post('/add', (req, res) => {
   var idProf = uuidv4();
   var id = uuidv4();
-  const { id, prenom, nom, adresse, moyenDeConnaissance, sexe, profession, dateprofession } = req.body;
+  const { prenom, nom, adresse, moyenDeConnaissance, sexe, profession } = req.body;
   var sqlProf = 'INSERT INTO profession (IdProfession, Profession, DateProfession) VALUES (?, ?, ?)';
   var sql = 'INSERT INTO patient (IdPatient, Prenom, Nom, Adresse, MoyenDeConnaissance, Sexe, IdProfession) VALUES (?, ?, ?, ?, ?, ?, ?)';
   var dateProfession = new Date();
