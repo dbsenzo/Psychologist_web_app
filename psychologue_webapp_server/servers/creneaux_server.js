@@ -24,6 +24,18 @@ router.get('/moisn-1', (req, res) => {
       res.send(result);
     });
 });
+
+
+router.get('/:id', (req, res) => {
+  var sql = "SELECT * FROM consulter WHERE IdPatient = ?";
+  req.connection.query(sql, [req.params.id], (err, result) => {
+    if (err) {
+      console.error('Erreur', err);
+      res.status(500).send('Erreur')
+    }
+    res.send(result)
+  })
+})
   
 router.get('/moisn', (req, res) => {
     var sql = "SELECT * FROM resamoisactuel";
@@ -105,6 +117,18 @@ router.delete('/delete/:id', (req, res) => {
           return;
         }
         res.send({ message: 'Creneau supprimé avec succès' });
+    });
+});
+
+router.get('/:id', (req, res) => {
+    var sql = "select concat(`psychologue`.`patient`.`Nom`,' ',substr(`psychologue`.`patient`.`Prenom`,1,1),'.') AS `title`,date_format(`psychologue`.`calendrier`.`Creneaux`,'%Y-%m-%dT%H:%i:%sZ') AS `start` from ((`psychologue`.`calendrier` join `psychologue`.`consulter` on(`psychologue`.`calendrier`.`IdCalendrier` = `psychologue`.`consulter`.`IdCalendrier`)) join `psychologue`.`patient` on(`psychologue`.`consulter`.`IdPatient` = `psychologue`.`patient`.`IdPatient`)) WHERE patient.IdPatient = ?";
+    req.connection.query(sql, [req.params.id], function (err, result) {
+      if (err) {
+        console.error('Erreur', err);
+        res.status(500).send('Erreur lors de la récupération des créneaux');
+        return;
+      }
+      res.send(result);
     });
 });
 

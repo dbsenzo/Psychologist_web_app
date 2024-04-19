@@ -65,8 +65,30 @@ router.post('/add', (req, res) => {
 
 router.put('/update/:id', (req, res) => {
     const { Prenom, Nom, Adresse, MoyenDeConnaissance, Sexe, Profession, IdPatient } = req.body;
-    var sql = 'UPDATE patient SET Prenom = ?, Nom = ?, Adresse = ?, MoyenDeConnaissance = ?, Sexe = ?, IdProfession = ?, DateProfession = ? WHERE IdPatient = ?';
-    req.connection.query(sql, [Prenom, Nom, Adresse, MoyenDeConnaissance, Sexe, Profession, IdPatient ], function (err, result) {
+
+    if (Profession != null) {
+      var idProf = uuidv4();
+      var sqlProf = 'INSERT INTO Profession (IdProfession, Profession, DateProfession) VALUES (?, ?, ?)';
+      var dateProfession = new Date();
+      req.connection.query(sqlProf, [idProf, Profession, dateProfession], function (err, result) {
+        if (err) {
+          console.error('Erreur', err);
+          res.status(500).send('Erreur lors de la modification de la profession');
+          return;
+        }
+      });
+      var sql = 'UPDATE patient SET Prenom = ?, Nom = ?, Adresse = ?, MoyenDeConnaissance = ?, Sexe = ?, IdProfession = ? WHERE IdPatient = ?';
+      req.connection.query(sql, [Prenom, Nom, Adresse, MoyenDeConnaissance, Sexe, idProf, IdPatient ], function (err, result) {
+        if (err) {
+          console.error('Erreur', err);
+          res.status(500).send('Erreur lors de la modification du patient');
+          return;
+        }
+        res.send({ message: 'Patient et profession modifié avec succès' });
+    });
+    }else{
+      var sql = 'UPDATE patient SET Prenom = ?, Nom = ?, Adresse = ?, MoyenDeConnaissance = ?, Sexe = ? WHERE IdPatient = ?';
+      req.connection.query(sql, [Prenom, Nom, Adresse, MoyenDeConnaissance, Sexe, IdPatient ], function (err, result) {
         if (err) {
           console.error('Erreur', err);
           res.status(500).send('Erreur lors de la modification du patient');
@@ -74,6 +96,7 @@ router.put('/update/:id', (req, res) => {
         }
         res.send({ message: 'Patient modifié avec succès' });
     });
+  }
 });
 
 router.delete('/delete/:id', (req, res) => {
