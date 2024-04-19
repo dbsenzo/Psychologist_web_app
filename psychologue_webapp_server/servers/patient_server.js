@@ -140,7 +140,7 @@ router.put('/update/:id', (req, res) => {
 router.delete('/delete/:id', (req, res) => {
     var sql = 'DELETE FROM patient WHERE IdPatient = ?';
     var sqlAcc = 'DELETE FROM account WHERE IdPatient = ?';
-    var sqlProf = 'DELETE FROM profession WHERE IdPatient = ?'
+    var sqlProf = 'DELETE FROM profession WHERE IdProfession = (SELECT IdProfession FROM Patient WHERE IdPatient = ?)';
 
     req.connection.query(sqlAcc, [req.params.id], function (err, result) {
       if (err) {
