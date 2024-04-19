@@ -1,3 +1,5 @@
+import { v4 as uuidv4 } from 'uuid';
+
 const express = require('express');
 const router = express.Router();
 
@@ -27,8 +29,8 @@ router.get('/:id', (req, res) => {
 });
 
 router.post('/add', (req, res) => {
-  var idProf = Math.floor(Math.random() * 100000000000);
-  var id = Math.floor(Math.random() * 100000000000);
+  var idProf = uuidv4();
+  var id = uuidv4();
   const { id, prenom, nom, adresse, moyenDeConnaissance, sexe, profession, dateprofession } = req.body;
   var sqlProf = 'INSERT INTO profession (IdProfession, Profession, DateProfession) VALUES (?, ?, ?)';
   var sql = 'INSERT INTO patient (IdPatient, Prenom, Nom, Adresse, MoyenDeConnaissance, Sexe, IdProfession) VALUES (?, ?, ?, ?, ?, ?, ?)';
