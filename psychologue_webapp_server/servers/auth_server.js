@@ -33,7 +33,7 @@ router.post('/login', (req, res) => {
         return;
       }
       // If credentials are correct, create a JWT
-      const token = jwt.sign({ id: user.id, username: user.username, isAdmin: user.isAdmin }, secretKey, { expiresIn: '1h' });
+      const token = jwt.sign({ id: user.IdPatient, username: user.username, isAdmin: user.isAdmin }, secretKey, { expiresIn: '1h' });
       res.send({ message: 'Login successful', token: token });
     });
   });
