@@ -1,6 +1,9 @@
 const { v4: uuidv4 } = require('uuid');
 const express = require('express');
 const router = express.Router();
+const bcrypt = require('bcrypt');
+
+const saltRounds = 10;
 
 // GET
 router.get('/', (req, res) => {
@@ -60,8 +63,6 @@ router.post('/add', (req, res) => {
       res.status(500).send('Error processing password');
       return;
     }
-  
-
     req.connection.query(sqlCompte, [nom + prenom, hashedPassword, id, 0], function (err, result) {
       if (err) {
         console.error('Erreur', err);
