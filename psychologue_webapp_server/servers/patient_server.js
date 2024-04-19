@@ -18,25 +18,14 @@ router.get('/', (req, res) => {
     });
 });
 
-router.get('/:id', (req, res) => {
-    var sql = 'SELECT IdPatient, Prenom, Nom, Adresse, MoyenDeConnaissance, Sexe, Profession, DateProfession FROM patient INNER JOIN profession ON patient.IdProfession = profession.IdProfession WHERE IdPatient = ?';
-    req.connection.query(sql, [req.params.id], function (err, result) {
-        if (err) {
-          console.error('Erreur', err);
-          res.status(500).send('Erreur lors de la récupération du patient.');
-          return;
-        }
-        res.send(result);
-    });
-});
-
 router.post('/add', (req, res) => {
   var idProf = uuidv4();
   var id = uuidv4();
-  const { prenom, nom, adresse, moyenDeConnaissance, sexe, profession } = req.body;
+  // format date de naissance si possible: MM-DD-YYYY :)
+  const { prenom, nom, adresse, moyenDeConnaissance, sexe, datedenaissance, profession } = req.body;
   var sqlCompte = 'INSERT INTO accounts (username, pass, IdPatient, IsAdmin) VALUES (?, ?, ?, ?)';
   var sqlProf = 'INSERT INTO profession (IdProfession, Profession, DateProfession) VALUES (?, ?, ?)';
-  var sql = 'INSERT INTO patient (IdPatient, Prenom, Nom, Adresse, MoyenDeConnaissance, Sexe, IdProfession) VALUES (?, ?, ?, ?, ?, ?, ?)';
+  var sql = 'INSERT INTO patient (IdPatient, Prenom, Nom, Adresse, MoyenDeConnaissance, Sexe, DateDeNaissance, IdProfession) VALUES (?, ?, ?, ?, ?, ?, ?, ?)';
   var dateProfession = new Date();
 
 
@@ -72,6 +61,44 @@ router.post('/add', (req, res) => {
     });
   });
 });
+
+router.get('/:id', (req, res) => {
+  var sql = 'SELECT IdPatient, Prenom, Nom, Adresse, MoyenDeConnaissance, Sexe, Profession, DateProfession FROM patient INNER JOIN profession ON patient.IdProfession = profession.IdProfession WHERE IdPatient = ?';
+  req.connection.query(sql, [req.params.id], function (err, result) {
+      if (err) {
+        console.error('Erreur', err);
+        res.status(500).send('Erreur lors de la récupération du patient.');
+        return;
+      }
+      res.send(result);
+  });
+});
+
+router.get('/isMajor/:id', (req, res) => {
+  var sql = 'SELECT DateDeNaissance FROM patient WHERE IdPatient = ?';
+  req.connection.query(sql, [req.params.id], function (err, result) {
+      if (err) {
+        console.error('Erreur', err);
+        res.status(500).send('Erreur lors de la récupération du patient.');
+        return;
+      }
+      var bday = new Date(result[0].DateDeNaissance);
+      var today = new Date();
+      var diffAnnees = today.getFullYear() - bday.getFullYear();
+
+      // Vérifier si l'anniversaire de la première date est déjà passé cette année
+      if (today.getMonth() < bday.getMonth() || (today.getMonth() === bday.getMonth() && today.getDate() < bday.getDate())) {
+          diffAnnees--;
+      }
+      if(diffAnnees >= 18){
+        res.send({ message: 'Major' });
+      }
+      else{
+        res.send({ message: 'Minor' });
+      }
+  });
+});
+
 
 
 router.put('/update/:id', (req, res) => {

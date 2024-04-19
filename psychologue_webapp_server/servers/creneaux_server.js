@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const { v4: uuidv4 } = require('uuid');
 
 router.get('/libres', (req, res) => {
     var sql = 'SELECT Creneaux FROM Calendrier WHERE IdCalendrier NOT IN (SELECT IdCalendrier FROM consulter)';
@@ -50,11 +51,11 @@ router.get('/all', (req, res) => {
 });
 
 router.post('/add', (req, res) => {
-  const formData = req.body;
-  console.log(formData);
+  const date = req.body;
+  var id = uuidv4();
 
-  var sql = 'INSERT INTO calendrier SET ?';
-  req.connection.query(sql, formData, function (err, result) {
+  var sql = 'INSERT INTO calendrier (IdCalendrier, Creneaux) VALUES (?, ?)';
+  req.connection.query(sql, [id, date], function (err, result) {
     if (err) {
       console.error('Erreur', err);
       res.status(500).send('Erreur lors de l\'ajout du Creneau');
@@ -78,13 +79,11 @@ router.get('/', (req, res) => {
   
 
 router.put('/update/:id', (req, res) => {
-    const idCreneau = req.params.id;
+    const idCalendrier = req.params.id;
     const formData = req.body;
-    console.log(formData);
-    console.log(idCreneau);
 
-    var sql = 'UPDATE calendrier SET ? WHERE IdCalendrier = ?';
-    req.connection.query(sql, [formData, idCreneau], function (err, result) {
+    var sql = 'UPDATE calendrier SET Creneaux = ? WHERE IdCalendrier = ?';
+    req.connection.query(sql, [formData, idCalendrier], function (err, result) {
         if (err) {
           console.error('Erreur', err);
           res.status(500).send('Erreur lors de la modification du Creneau');
@@ -97,6 +96,15 @@ router.put('/update/:id', (req, res) => {
 router.delete('/delete/:id', (req, res) => {
     const idCreneau = req.params.id;
     console.log(idCreneau);
+    var sqlConsult = 'DELETE FROM consulter WHERE IdCalendrier = ?';
+
+    req.connection.query(sqlConsult, [idCreneau], function (err, result) {
+        if (err) {
+          console.error('Erreur', err);
+          res.status(500).send('Erreur lors de la suppression du Creneau');
+          return;
+        }
+    });
 
     var sql = 'DELETE FROM calendrier WHERE IdCalendrier = ?';
     req.connection.query(sql, [idCreneau], function (err, result) {
