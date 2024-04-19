@@ -149,14 +149,6 @@ router.delete('/delete/:id', (req, res) => {
         return;
       }
     });
-
-    req.connection.query(sqlProf, [req.params.id], function (err, result) {
-      if (err) {
-        console.error('Erreur', err);
-        res.status(500).send('Erreur lors de la suppression de la profession du patient');
-        return;
-      }
-    });
     
     req.connection.query(sql, [req.params.id], function (err, result) {
         if (err) {
@@ -165,6 +157,14 @@ router.delete('/delete/:id', (req, res) => {
           return;
         }
         res.send({ message: 'Patient supprimé avec succès' });
+    });
+
+    req.connection.query(sqlProf, [req.params.id], function (err, result) {
+      if (err) {
+        console.error('Erreur', err);
+        res.status(500).send('Erreur lors de la suppression de la profession du patient');
+        return;
+      }
     });
 });
 
