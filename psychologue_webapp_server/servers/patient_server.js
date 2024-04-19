@@ -27,10 +27,22 @@ router.get('/:id', (req, res) => {
 });
 
 router.post('/add', (req, res) => {
-  const { prenom, nom, adresse, moyenDeConnaissance, sexe, profession } = req.body;
-  var sql = 'INSERT INTO patient (Prenom, Nom, Adresse, MoyenDeConnaissance, Sexe, IdProfession, DateProfession) VALUES (?, ?, ?, ?, ?, ?, ?)';
+  var idProf = Math.floor(Math.random() * 100000000000);
+  var id = Math.floor(Math.random() * 100000000000);
+  const { id, prenom, nom, adresse, moyenDeConnaissance, sexe, profession, dateprofession } = req.body;
+  var sqlProf = 'INSERT INTO profession (IdProfession, Profession, DateProfession) VALUES (?, ?, ?)';
+  var sql = 'INSERT INTO patient (IdPatient, Prenom, Nom, Adresse, MoyenDeConnaissance, Sexe, IdProfession) VALUES (?, ?, ?, ?, ?, ?, ?)';
   var dateProfession = new Date();
-  req.connection.query(sql, [prenom, nom, adresse, moyenDeConnaissance, sexe, profession, dateProfession], function (err, result) {
+
+  req.connection.query(sqlProf, [idProf, profession, dateProfession], function (err, result) {
+    if (err) {
+      console.error('Erreur', err);
+      res.status(500).send('Erreur lors de l\'ajout de la profession ', err);
+      return;
+    }
+  });
+
+  req.connection.query(sql, [id, prenom, nom, adresse, moyenDeConnaissance, sexe, idProf], function (err, result) {
     if (err) {
       console.error('Erreur', err);
       res.status(500).send('Erreur lors de l\'ajout du patient ', err);
