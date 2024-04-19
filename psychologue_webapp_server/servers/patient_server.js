@@ -54,15 +54,22 @@ router.post('/add', (req, res) => {
     res.send({ message: 'Patient ajouté avec succès' });
   });
   
-  req.connection.query(sqlCompte, [nom + prenom, nom + prenom , id, 0], function (err, result) {
+  bcrypt.hash(nom + prenom, saltRounds, function(err, hashedPassword) {
     if (err) {
-      console.error('Erreur', err);
-      res.status(500).send('Erreur lors de l\'ajout du compte ', err);
+      console.error('Error hashing password', err);
+      res.status(500).send('Error processing password');
       return;
     }
+  
+
+    req.connection.query(sqlCompte, [nom + prenom, hashedPassword, id, 0], function (err, result) {
+      if (err) {
+        console.error('Erreur', err);
+        res.status(500).send('Erreur lors de l\'ajout du compte ', err);
+        return;
+      }
+    });
   });
-
-
 });
 
 
