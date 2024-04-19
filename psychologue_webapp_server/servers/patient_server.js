@@ -140,12 +140,21 @@ router.put('/update/:id', (req, res) => {
 router.delete('/delete/:id', (req, res) => {
     var sql = 'DELETE FROM patient WHERE IdPatient = ?';
     var sqlAcc = 'DELETE FROM account WHERE IdPatient = ?';
+    var sqlConsult = 'DELETE FROM consulter WHERE IdPatient = ?';
     var sqlProf = 'DELETE FROM profession WHERE IdProfession = (SELECT IdProfession FROM Patient WHERE IdPatient = ?)';
 
     req.connection.query(sqlAcc, [req.params.id], function (err, result) {
       if (err) {
         console.error('Erreur', err);
         res.status(500).send('Erreur lors de la suppression du compte du patient');
+        return;
+      }
+    });
+
+    req.connection.query(sqlConsult, [req.params.id], function (err, result) {
+      if (err) {
+        console.error('Erreur', err);
+        res.status(500).send('Erreur lors de la suppression des consultations du patient');
         return;
       }
     });
