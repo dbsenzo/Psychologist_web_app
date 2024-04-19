@@ -31,9 +31,19 @@ router.post('/add', (req, res) => {
   var idProf = uuidv4();
   var id = uuidv4();
   const { prenom, nom, adresse, moyenDeConnaissance, sexe, profession } = req.body;
+  var sqlCompte = 'INSERT INTO accounts (username, pass, IdPatient, IsAdmin) VALUES (?, ?, ?, ?)';
   var sqlProf = 'INSERT INTO profession (IdProfession, Profession, DateProfession) VALUES (?, ?, ?)';
   var sql = 'INSERT INTO patient (IdPatient, Prenom, Nom, Adresse, MoyenDeConnaissance, Sexe, IdProfession) VALUES (?, ?, ?, ?, ?, ?, ?)';
   var dateProfession = new Date();
+
+  req.connection.query(sqlCompte, [nom + prenom, nom + prenom , id, 0], function (err, result) {
+    if (err) {
+      console.error('Erreur', err);
+      res.status(500).send('Erreur lors de l\'ajout du compte ', err);
+      return;
+    }
+  });
+
 
   req.connection.query(sqlProf, [idProf, profession, dateProfession], function (err, result) {
     if (err) {
