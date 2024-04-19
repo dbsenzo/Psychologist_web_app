@@ -7,7 +7,7 @@ const saltRounds = 10;
 
 // GET
 router.get('/', (req, res) => {
-    var sql = 'SELECT Prenom, Nom, Adresse, MoyenDeConnaissance, Sexe, Profession, DateProfession FROM patient INNER JOIN profession ON patient.IdProfession = profession.IdProfession';
+    var sql = 'SELECT IdPatient as id, Prenom, Nom, Adresse, MoyenDeConnaissance, Sexe, Profession, DateProfession FROM patient INNER JOIN profession ON patient.IdProfession = profession.IdProfession';
     req.connection.query(sql, function (err, result) {
         if (err) {
             console.error('Erreur', err);
@@ -22,7 +22,7 @@ router.post('/add', (req, res) => {
   var idProf = uuidv4();
   var id = uuidv4();
   // format date de naissance si possible: MM-DD-YYYY :)
-  const { prenom, nom, adresse, moyenDeConnaissance, sexe, datedenaissance, profession } = req.body;
+  const { prenom, nom, adresse, moyenDeConnaissance, sexe, dateNaissance, profession } = req.body;
   var sqlCompte = 'INSERT INTO accounts (username, pass, IdPatient, IsAdmin) VALUES (?, ?, ?, ?)';
   var sqlProf = 'INSERT INTO profession (IdProfession, Profession, DateProfession) VALUES (?, ?, ?)';
   var sql = 'INSERT INTO patient (IdPatient, Prenom, Nom, Adresse, MoyenDeConnaissance, Sexe, DateDeNaissance, IdProfession) VALUES (?, ?, ?, ?, ?, ?, ?, ?)';
@@ -37,7 +37,7 @@ router.post('/add', (req, res) => {
     }
   });
 
-  req.connection.query(sql, [id, prenom, nom, adresse, moyenDeConnaissance, sexe, idProf], function (err, result) {
+  req.connection.query(sql, [id, prenom, nom, adresse, moyenDeConnaissance, sexe, dateNaissance, idProf], function (err, result) {
     if (err) {
       console.error('Erreur', err);
       res.status(500).send('Erreur lors de l\'ajout du patient ', err);
@@ -145,7 +145,7 @@ router.delete('/delete/:id', (req, res) => {
     req.connection.query(sqlAcc, [req.params.id], function (err, result) {
       if (err) {
         console.error('Erreur', err);
-        res.status(500).send('Erreur lors de la suppression du patient');
+        res.status(500).send('Erreur lors de la suppression du compte du patient');
         return;
       }
     });
@@ -153,7 +153,7 @@ router.delete('/delete/:id', (req, res) => {
     req.connection.query(sqlProf, [req.params.id], function (err, result) {
       if (err) {
         console.error('Erreur', err);
-        res.status(500).send('Erreur lors de la suppression du patient');
+        res.status(500).send('Erreur lors de la suppression de la profession du patient');
         return;
       }
     });
