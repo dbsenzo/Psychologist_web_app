@@ -55,9 +55,9 @@ router.post('/add', (req, res) => {
 });
 
 router.put('/update/:id', (req, res) => {
-    const { Prenom, Nom, Adresse, MoyenDeConnaissance, Sexe, Profession } = req.body;
+    const { Prenom, Nom, Adresse, MoyenDeConnaissance, Sexe, Profession, IdPatient } = req.body;
     var sql = 'UPDATE patient SET Prenom = ?, Nom = ?, Adresse = ?, MoyenDeConnaissance = ?, Sexe = ?, IdProfession = ?, DateProfession = ? WHERE IdPatient = ?';
-    req.connection.query(sql, [Prenom, Nom, Adresse, MoyenDeConnaissance, Sexe, Profession, req.params.id], function (err, result) {
+    req.connection.query(sql, [Prenom, Nom, Adresse, MoyenDeConnaissance, Sexe, Profession, IdPatient ], function (err, result) {
         if (err) {
           console.error('Erreur', err);
           res.status(500).send('Erreur lors de la modification du patient');
@@ -69,6 +69,25 @@ router.put('/update/:id', (req, res) => {
 
 router.delete('/delete/:id', (req, res) => {
     var sql = 'DELETE FROM patient WHERE IdPatient = ?';
+    var sqlAcc = 'DELETE FROM account WHERE IdPatient = ?';
+    var sqlProf = 'DELETE FROM profession WHERE IdPatient = ?'
+
+    req.connection.query(sqlAcc, [req.params.id], function (err, result) {
+      if (err) {
+        console.error('Erreur', err);
+        res.status(500).send('Erreur lors de la suppression du patient');
+        return;
+      }
+    });
+
+    req.connection.query(sqlProf, [req.params.id], function (err, result) {
+      if (err) {
+        console.error('Erreur', err);
+        res.status(500).send('Erreur lors de la suppression du patient');
+        return;
+      }
+    });
+    
     req.connection.query(sql, [req.params.id], function (err, result) {
         if (err) {
           console.error('Erreur', err);
