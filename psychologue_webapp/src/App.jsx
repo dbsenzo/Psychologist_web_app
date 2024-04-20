@@ -11,6 +11,7 @@ import { useContext, useEffect } from 'react';
 import ProtectedRoute from './components/Navigation/ProtectedRoute';
 import NotFoundPage from './components/Navigation/NotFound';
 import { ClientHomepage } from './page/ClientHomepage';
+import { ClientsProvider } from './context/ClientsContext';
 
 
 const HeaderLayout = () => {
@@ -93,7 +94,9 @@ const App = () => {
   return (
     <ChakraProvider theme={theme}>
       <AuthContextProvider>
-        <RouterProvider router={router} />
+        <ClientsProvider>
+          <RouterProvider router={router} />
+        </ClientsProvider>
       </AuthContextProvider>
     </ChakraProvider>
   )

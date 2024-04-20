@@ -8,27 +8,18 @@ import ClientsAPI from "../services/ClientsAPI";
 import { BreadcrumbCustom } from "../components/Dashboard_Box/Breadcrumb";
 import { BoxOne } from "../components/Dashboard_Box/Box1";
 import { useNotification } from "../services/NotificationService";
+import { useClients } from "../context/ClientsContext";
 
 export function Reserver() {
     const { isOpen: isAddPatientOpen, onOpen: onAddPatientOpen, onClose: onAddPatientClose } = useDisclosure();
     const { isOpen: isUpdatePatientOpen, onOpen: onUpdatePatientOpen, onClose: onUpdatePatientClose } = useDisclosure();
     const { isOpen: isConfirmOpen, onOpen: onConfirmOpen, onClose: onConfirmClose } = useDisclosure();
+    const { setClients, clients, fetchClients } = useClients();
     const { notify } = useNotification();
-    const [patientsObject, setPatientsObject] = useState([]);
     const [selectedPatient, setSelectedPatient] = useState(null); 
 
-    const fetchPatientsObject = async () => {
-        try {
-            const data = await ClientsAPI.getClients();
-            console.log(data);
-            setPatientsObject(data);
-        } catch (error) {
-            console.error("Error fetching patients:", error);
-        }
-    }
-
     useEffect(() => {
-        fetchPatientsObject();
+        fetchClients();
     }, [])
 
     const handleEditPatient = (patient) => {
@@ -53,7 +44,7 @@ export function Reserver() {
                     description: "Patient supprimé avec succès.",
                     status: "success"
                 });
-                setPatientsObject(prevPatients => prevPatients.filter(p => p.id !== selectedPatient.id));
+                setClients(prevPatients => prevPatients.filter(p => p.id !== selectedPatient.id));
               })
               .catch(error => {
                   notify({
@@ -79,7 +70,7 @@ export function Reserver() {
                 <Box display={'flex'} justifyContent={'center'}>
                     <BoxOne width={"90%"} height="fit-content" component={
                         <TableauDisplayUser
-                            patients={patientsObject}
+                            patients={clients}
                             editOnClick={handleEditPatient}
                             deleteOnClick={handleDeletePatient}
                             openAddModal={onAddPatientOpen}
@@ -89,8 +80,8 @@ export function Reserver() {
             </Box>
 
             {/* Modals */}
-            <ModalAddPatient isOpen={isAddPatientOpen} onClose={() => (onAddPatientClose(),fetchPatientsObject())}/>
-            <ModalUpdatePatient isOpen={isUpdatePatientOpen} onClose={() => (onUpdatePatientClose(),fetchPatientsObject()) } patient={selectedPatient}/>
+            <ModalAddPatient isOpen={isAddPatientOpen} onClose={() => (onAddPatientClose(),fetchClients())}/>
+            <ModalUpdatePatient isOpen={isUpdatePatientOpen} onClose={() => (onUpdatePatientClose(),fetchClients()) } patient={selectedPatient}/>
             <ModalConfirm
                 isOpen={isConfirmOpen}
                 onClose={onConfirmClose}

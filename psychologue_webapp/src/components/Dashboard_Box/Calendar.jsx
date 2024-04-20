@@ -6,12 +6,13 @@ import AppointmentsAPI from '../../services/AppointmentsAPI';
 import moment from 'moment';
 import PropTypes from 'prop-types';
 import { AuthContext } from '../../context/AuthContext';
-import { Box, Button, Text } from '@chakra-ui/react';
+import { Box, Button, Text, useDisclosure } from '@chakra-ui/react';
 import { useContext, useEffect, useState } from 'react';
+import ModalAddCreneau from '../Modal/ModalAddCreneau';
 
 
 export function Calendar({clientId = null, addClient = false}) {
-
+  const { isOpen: isAddCreneauOpen, onOpen: onAddCreneauOpen, onClose: onAddCreneauClose } = useDisclosure();
   const [events, setEvents] = useState([]);
   const { logout } = useContext(AuthContext);
 
@@ -48,7 +49,7 @@ export function Calendar({clientId = null, addClient = false}) {
     myCustomButton: {
       text: "+ Rendez-vous",
       click: function() {
-        alert('clicked the custom button!');
+        onAddCreneauOpen()
       },
     },
   };
@@ -99,11 +100,14 @@ export function Calendar({clientId = null, addClient = false}) {
         headerToolbar={addClient ? headerToolbar : headerToolbarWithoutButton} // Apply header toolbar configuration here.
         
       />
+      <ModalAddCreneau isOpen={isAddCreneauOpen} onClose={onAddCreneauClose} />
     </Box>
+    
   );
 }
 
 
 Calendar.propTypes = {
   clientId: PropTypes.number,
+  addClient: PropTypes.bool
 }
