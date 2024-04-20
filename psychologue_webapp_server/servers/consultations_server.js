@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const { v4: uuidv4 } = require('uuid');
 
 router.get('/', (req, res) => {
   var sql = 'SELECT Prenom, Nom, Sexe, Profession, Creneaux, Retard, Prix, ModeDeReglement, IndicateurAnxiete, NombreDePersonnes, Observations'
@@ -17,16 +18,15 @@ router.get('/', (req, res) => {
 
 // insérer une consultation
 router.post('/add', (req, res) => {
-  const { IdPatient, IdCalendrier, Prix, NombreDePersonnes } = req.body;
-  const consultation = {
-    IdPatient,
-    IdCalendrier,
-    Prix,
-    NombreDePersonnes,
-  };
-
-    const sql = 'INSERT INTO consulter (IdPatient, IdCalendrier, Prix, NombreDePersonnes) SET (?,?,?,?)';
-    req.connection.query(sql, consultation, (err, result) => {
+  const { IdPatient, DateCreneau, Prix, NombreDePersonnes } = req.body;
+  var idcal = uuiv4();
+    req.connection.query('INSERT INTO calendrier(IdCalendrier, Creneaux) VALUES (?,?)', [idcal, DateCreneau], (err, result) => {
+      if (err) {
+        console.log('Erreur', err);
+      }
+    })
+    const sql = 'INSERT INTO consulter (IdPatient, IdCalendrier, Prix, NombreDePersonnes) VALUES (?,?,?,?)';
+    req.connection.query(sql, [IdPatient, idcal, Prix, NombreDePersonnes], (err, result) => {
     if (err) {
       console.error('Erreur', err);
       res.status(500).send('Erreur lors de l\'insertion de la consultation');
