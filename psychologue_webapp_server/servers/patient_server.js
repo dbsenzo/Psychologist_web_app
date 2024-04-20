@@ -103,6 +103,8 @@ router.get('/isMajor/:id', (req, res) => {
 
 router.put('/update/:id', (req, res) => {
     const { Prenom, Nom, Adresse, MoyenDeConnaissance, Sexe, Profession, IdPatient } = req.body;
+    
+    console.log(req.body);
 
     if (Profession != null) {
       var idProf = uuidv4();
@@ -124,6 +126,7 @@ router.put('/update/:id', (req, res) => {
         }
         res.send({ message: 'Patient et profession modifié avec succès' });
     });
+
     }else{
       var sql = 'UPDATE patient SET Prenom = ?, Nom = ?, Adresse = ?, MoyenDeConnaissance = ?, Sexe = ? WHERE IdPatient = ?';
       req.connection.query(sql, [Prenom, Nom, Adresse, MoyenDeConnaissance, Sexe, IdPatient ], function (err, result) {
@@ -138,43 +141,59 @@ router.put('/update/:id', (req, res) => {
 });
 
 router.delete('/delete/:id', (req, res) => {
-    var sql = 'DELETE FROM patient WHERE IdPatient = ?';
-    var sqlAcc = 'DELETE FROM accounts WHERE IdPatient = ?';
-    var sqlConsult = 'DELETE FROM consulter WHERE IdPatient = ?';
-    var sqlProf = 'DELETE FROM profession WHERE IdProfession = (SELECT IdProfession FROM Patient WHERE IdPatient = ?)';
+  const patientId = req.params.id;
 
-    req.connection.query(sqlAcc, [req.params.id], function (err, result) {
+  // D'abord récupérer le IdProfession avant la suppression
+  req.connection.query('SELECT IdProfession FROM patient WHERE IdPatient = ?', [patientId], function (err, results) {
       if (err) {
-        console.error('Erreur', err);
-        res.status(500).send('Erreur lors de la suppression du compte du patient');
-        return;
-      }
-    });
-
-    req.connection.query(sqlConsult, [req.params.id], function (err, result) {
-      if (err) {
-        console.error('Erreur', err);
-        res.status(500).send('Erreur lors de la suppression des consultations du patient');
-        return;
-      }
-    });
-    
-    req.connection.query(sql, [req.params.id], function (err, result) {
-        if (err) {
-          console.error('Erreur', err);
-          res.status(500).send('Erreur lors de la suppression du patient');
+          console.error('Erreur lors de la récupération de la profession', err);
+          res.status(500).send('Erreur lors de la récupération de la profession du patient');
           return;
-        }
-        res.send({ message: 'Patient supprimé avec succès' });
-    });
-
-    req.connection.query(sqlProf, [req.params.id], function (err, result) {
-      if (err) {
-        console.error('Erreur', err);
-        res.status(500).send('Erreur lors de la suppression de la profession du patient');
-        return;
       }
-    });
+
+      const professionId = results[0].IdProfession;
+
+      // Suppression du compte
+      req.connection.query('DELETE FROM accounts WHERE IdPatient = ?', [patientId], function (err, result) {
+          if (err) {
+              console.error('Erreur', err);
+              res.status(500).send('Erreur lors de la suppression du compte du patient');
+              return;
+          }
+      });
+
+      // Suppression des consultations
+      req.connection.query('DELETE FROM consulter WHERE IdPatient = ?', [patientId], function (err, result) {
+          if (err) {
+              console.error('Erreur', err);
+              res.status(500).send('Erreur lors de la suppression des consultations du patient');
+              return;
+          }
+      });
+
+      // Suppression du patient
+      req.connection.query('DELETE FROM patient WHERE IdPatient = ?', [patientId], function (err, result) {
+          if (err) {
+              console.error('Erreur', err);
+              res.status(500).send('Erreur lors de la suppression du patient');
+              return;
+          }
+
+          // Suppression de la profession si professionId existe
+          if (professionId) {
+              req.connection.query('DELETE FROM profession WHERE IdProfession = ?', [professionId], function (err, result) {
+                  if (err) {
+                      console.error('Erreur', err);
+                      res.status(500).send('Erreur lors de la suppression de la profession du patient');
+                      return;
+                  }
+              });
+          }
+
+          res.send({ message: 'Patient supprimé avec succès' });
+      });
+  });
 });
+
 
 module.exports = router;
