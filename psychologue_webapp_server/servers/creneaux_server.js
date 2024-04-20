@@ -3,15 +3,40 @@ const router = express.Router();
 const { v4: uuidv4 } = require('uuid');
 
 router.get('/libres', (req, res) => {
-    var sql = 'SELECT Creneaux FROM Calendrier WHERE IdCalendrier NOT IN (SELECT IdCalendrier FROM consulter)';
-    req.connection.query(sql, function (err, result) {
-      if (err) {
-        console.error('Erreur', err);
-        res.status(500).send('Erreur lors de la récupération des Creneaux libres');
-        return;
-      }
-      res.send(result);
-    });
+  const { dateCreneau } = req.body; // Assurez-vous que cette date est envoyée au format YYYY-MM-DD
+  const startHour = 8;
+  const endHour = 20;
+  const date = new Date(dateCreneau);
+  const creneaux = [];
+
+  // Générer les créneaux de 8h à 20h pour la date donnée
+  for (let hour = startHour; hour <= endHour; hour++) {
+    const newDate = new Date(date.getFullYear(), date.getMonth(), date.getDate(), hour);
+    creneaux.push(newDate);
+  }
+
+  // Convertir les dates en format SQL datetime
+  const formatSQL = creneaux.map(c => c.toISOString().slice(0, 19).replace('T', ' '));
+
+  // Requête pour obtenir les créneaux occupés
+  var sql = `SELECT Creneaux FROM Calendrier
+    WHERE Creneaux IN (?)
+    AND DAY(Creneaux) = DAY(?)
+    AND MONTH(Creneaux) = MONTH(?)
+    AND YEAR(Creneaux) = YEAR(?)`;
+
+  req.connection.query(sql, [formatSQL, date, date, date], function (err, result) {
+    if (err) {
+      console.error('Erreur', err);
+      res.status(500).send('Erreur lors de la récupération des Créneaux libres');
+      return;
+    }
+    // Filtrer pour obtenir les créneaux libres
+    const occupied = new Set(result.map(item => item.Creneaux));
+    const freeSlots = formatSQL.filter(c => !occupied.has(c));
+
+    res.send(freeSlots);
+  });
 });
   
 router.get('/moisn-1', (req, res) => {

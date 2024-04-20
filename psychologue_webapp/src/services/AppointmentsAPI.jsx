@@ -30,15 +30,39 @@ class AppointmentsAPI {
                 body: JSON.stringify(appointmentData)
             });
             if (!response.ok) {
-                throw new Error("HTTP error " + response.status);
+                throw new Error(response.message);
             }
             const data = await response.json();
             return data; // You might want to return some data or a success message
         } catch (error) {
-            console.error('Failed to add appointment.', error.message);
+            console.error('Failed to add appointment.', error);
             throw error;  // It's better to throw the error to handle it in the component.
         }
     }
+
+    static async getAppointmentsFreeHours(dateCreneaux) {
+        let url = 'http://localhost:3000/creneaux/libres';
+        
+        try {
+            const response = await fetch(url, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(dateCreneaux)
+            });
+            
+            if (!response.ok) {
+                throw new Error("HTTP error " + response.status);
+            }
+            const data = await response.json();
+            console.log(data);
+            return data;
+        } catch (error) {
+            console.log('Unable to load data, server may be down.');
+        }
+    }
+
 }
 
 export default AppointmentsAPI;

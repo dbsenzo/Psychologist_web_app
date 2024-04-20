@@ -43,6 +43,13 @@ function ModalAddCreneau({ isOpen, onClose }) {
         return Object.values(creneauData).every(value => value);
     };
 
+    const handleGetFreeAppointments = async () => {
+        // Call the API to get free appointments
+        const freeAppointments = await AppointmentsAPI.getAppointmentsFreeHours(creneauData.dateCreneau);
+        console.log(freeAppointments);
+        
+    }
+
     const handleSubmit = async () => {
         console.log(creneauData);
         if (!isFormValid()) {

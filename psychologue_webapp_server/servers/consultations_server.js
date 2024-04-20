@@ -19,7 +19,7 @@ router.get('/', (req, res) => {
 // insérer une consultation
 router.post('/add', (req, res) => {
   const { IdPatient, DateCreneau, Prix, NombreDePersonnes } = req.body;
-  var idcal = uuiv4();
+  var idcal = uuidv4();
     req.connection.query('INSERT INTO calendrier(IdCalendrier, Creneaux) VALUES (?,?)', [idcal, DateCreneau], (err, result) => {
       if (err) {
         console.log('Erreur', err);
@@ -29,10 +29,10 @@ router.post('/add', (req, res) => {
     req.connection.query(sql, [IdPatient, idcal, Prix, NombreDePersonnes], (err, result) => {
     if (err) {
       console.error('Erreur', err);
-      res.status(500).send('Erreur lors de l\'insertion de la consultation');
+      res.status(500).send({message: 'Erreur lors de l\'insertion de la consultation: ' + err.sqlMessage});
       return;
     }
-    res.send('Consultation insérée avec succès');
+    res.send({message: 'Créneau ajoutée avec succès'});
   });
 });
 
