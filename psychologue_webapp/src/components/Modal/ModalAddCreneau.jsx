@@ -17,6 +17,7 @@ import {
 import PropTypes from 'prop-types';
 import { useClients } from '../../context/ClientsContext';
 import AppointmentsAPI from '../../services/AppointmentsAPI';
+import moment from 'moment-timezone';
 
 function ModalAddCreneau({ isOpen, onClose }) {
     const [creneauData, setCreneauData] = useState({
@@ -78,34 +79,37 @@ function ModalAddCreneau({ isOpen, onClose }) {
     
 
     const handleSubmit = async () => {
-        console.log(creneauData);
         if (!isFormValid()) {
-        toast({
-            title: "Erreur",
-            description: "Veuillez remplir tous les champs requis.",
-            status: "warning",
-            duration: 5000,
-            isClosable: true
-        });
-        return;
+            toast({
+                title: "Erreur",
+                description: "Veuillez remplir tous les champs requis.",
+                status: "warning",
+                duration: 5000,
+                isClosable: true
+            });
+            return;
         }
-
+    
         // Combine date and time into a single ISO string for the backend
-        const completeDate = new Date(creneauData.dateCreneau + 'T' + creneauData.heureCreneau);
+        const dateMoment = moment.tz(creneauData.dateCreneau + 'T' + creneauData.heureCreneau, "YYYY-MM-DDTHH:mm", "Europe/Paris"); // Assurez-vous de spécifier le bon fuseau horaire
+        const completeDate = dateMoment.toISOString();
+    
         const dataToSend = {
             IdPatient: creneauData.idPatient,
-            DateCreneau: completeDate.toISOString(), // Assurez-vous que le backend peut gérer ce format
+            DateCreneau: completeDate, // Assurez-vous que le backend peut gérer ce format
             Prix: 0, // Assume no cost specified, adjust accordingly
             NombreDePersonnes: 1, // Default value, adjust if needed
             Motif: creneauData.motif
         };
-
+    
         await AppointmentsAPI.addAppointment(dataToSend)
         .then(() => {
             toast({
             title: "Succès",
             description: "Créneau ajouté avec succès.",
-            status: "success"
+            status: "success",
+            duration: 5000,
+            isClosable: true
             });
             onClose();
         })
@@ -113,7 +117,9 @@ function ModalAddCreneau({ isOpen, onClose }) {
             toast({
             title: "Erreur",
             description: error.message || "Une erreur s'est produite lors de l'ajout du créneau.",
-            status: "error"
+            status: "error",
+            duration: 5000,
+            isClosable: true
             });
         });
     };

@@ -1,43 +1,42 @@
 const express = require('express');
 const router = express.Router();
 const { v4: uuidv4 } = require('uuid');
+const moment = require('moment-timezone');
+const timeZone = 'Europe/Paris';
 
 router.get('/libres', (req, res) => {
-  // Recevoir la date depuis les paramètres de la requête
-  const { dateCreneau } = req.query; // Assurez-vous que cette date est envoyée au format YYYY-MM-DD
+  const { dateCreneau } = req.query;
   if (!dateCreneau) {
     return res.status(400).send("La date du créneau est requise.");
   }
 
-  const date = new Date(dateCreneau);
   const creneaux = [];
 
   // Générer les créneaux de 8h à 20h pour la date donnée
   for (let hour = 8; hour <= 20; hour++) {
-    const newDate = new Date(date.getFullYear(), date.getMonth(), date.getDate(), hour);
-    creneaux.push(newDate);
+    const time = moment.tz(`${dateCreneau} ${hour}:00`, "YYYY-MM-DD HH:mm", timeZone);
+    creneaux.push(time.format('YYYY-MM-DD HH:mm:ss'));
   }
 
-  // Convertir les dates en format SQL datetime
-  const formatSQL = creneaux.map(c => c.toISOString().slice(0, 19).replace('T', ' '));
-
   // Requête pour obtenir les créneaux occupés
-  var sql = `SELECT Creneaux FROM Calendrier
-    WHERE Creneaux IN (?) AND DATE(Creneaux) = ?`;
+  var sql = `SELECT DATE_FORMAT(Creneaux, '%Y-%m-%d %H:%i:%s') AS Creneaux FROM Calendrier
+    WHERE DATE(Creneaux) = DATE(?)`;
 
-  req.connection.query(sql, [formatSQL, dateCreneau], function (err, result) {
+  req.connection.query(sql, [dateCreneau], function (err, result) {
     if (err) {
       console.error('Erreur', err);
-      res.status(500).send('Erreur lors de la récupération des Créneaux libres');
+      res.status(500).send('Erreur lors de la récupération des créneaux libres');
       return;
     }
     // Filtrer pour obtenir les créneaux libres
     const occupied = new Set(result.map(item => item.Creneaux));
-    const freeSlots = formatSQL.filter(c => !occupied.has(c));
+    const freeSlots = creneaux.filter(c => !occupied.has(c));
+    const formattedSlots = freeSlots.map(slot => moment(slot).format('HH:mm'));
 
-    res.send(freeSlots);
+    res.send(formattedSlots);
   });
 });
+
 
   
 router.get('/moisn-1', (req, res) => {
