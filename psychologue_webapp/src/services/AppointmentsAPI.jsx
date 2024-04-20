@@ -40,16 +40,17 @@ class AppointmentsAPI {
         }
     }
 
-    static async getAppointmentsFreeHours(dateCreneaux) {
-        let url = 'http://localhost:3000/creneaux/libres';
+    static async getAppointmentsFreeHours(dateCreneau) {
+        // Encodage de la date dans les paramètres de l'URL
+        const params = new URLSearchParams({ dateCreneau }).toString();
+        let url = `http://localhost:3000/creneaux/libres?${params}`;
         
         try {
             const response = await fetch(url, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(dateCreneaux)
+                }
             });
             
             if (!response.ok) {
@@ -59,9 +60,10 @@ class AppointmentsAPI {
             console.log(data);
             return data;
         } catch (error) {
-            console.log('Unable to load data, server may be down.');
+            console.error('Unable to load free appointments:', error.message);
+            throw error;  // It's usually better to throw the error to allow handling it in the calling context.
         }
-    }
+    }    
 
 }
 

@@ -26,29 +26,56 @@ function ModalAddCreneau({ isOpen, onClose }) {
         motif: ''
     });
 
+    const [availableHours, setAvailableHours] = useState([]);
+
     const { clients } = useClients();
     const toast = useToast();
 
-    const handleChange = (e) => {
+    const handleChange = async (e) => {
         const { name, value } = e.target;
-        console.log(name,value)
         setCreneauData(prevState => ({
-        ...prevState,
-        [name]: value
+            ...prevState,
+            [name]: value
         }));
+    
+        if (name === "dateCreneau" && value) {
+            handleGetFreeAppointments(value);
+        }
     };
+    
 
     const isFormValid = () => {
         // Validation logic here, e.g., check if all fields are filled
         return Object.values(creneauData).every(value => value);
     };
 
-    const handleGetFreeAppointments = async () => {
-        // Call the API to get free appointments
-        const freeAppointments = await AppointmentsAPI.getAppointmentsFreeHours(creneauData.dateCreneau);
-        console.log(freeAppointments);
-        
-    }
+    const handleGetFreeAppointments = async (date) => {
+        try {
+            const freeAppointments = await AppointmentsAPI.getAppointmentsFreeHours(date);
+            if (freeAppointments && freeAppointments.length > 0) {
+                setAvailableHours(freeAppointments);
+            } else {
+                setAvailableHours([]);
+                toast({
+                    title: "Aucun créneau disponible",
+                    description: "Il n'y a pas de créneaux disponibles pour cette date.",
+                    status: "info",
+                    duration: 5000,
+                    isClosable: true
+                });
+            }
+        } catch (error) {
+            console.error("Error fetching free appointments:", error);
+            toast({
+                title: "Erreur",
+                description: "Impossible de récupérer les créneaux libres.",
+                status: "error",
+                duration: 5000,
+                isClosable: true
+            });
+        }
+    };
+    
 
     const handleSubmit = async () => {
         console.log(creneauData);
@@ -104,8 +131,14 @@ function ModalAddCreneau({ isOpen, onClose }) {
                 </FormControl>
 
                 <FormControl mt={4} isRequired>
-                <FormLabel>Heure du créneau</FormLabel>
-                <Input type="time" name="heureCreneau" value={creneauData.heureCreneau} onChange={handleChange} />
+                    <FormLabel>Heure du créneau</FormLabel>
+                    <Select placeholder="Sélectionnez une heure" name="heureCreneau" value={creneauData.heureCreneau} onChange={handleChange}>
+                        {availableHours.map((hour, index) => {
+                            console.log(hour)
+                            return(
+                            <option key={index} value={hour}>{hour}</option>
+                        )})}
+                    </Select>
                 </FormControl>
 
                 <FormControl mt={4} isRequired>
@@ -118,8 +151,8 @@ function ModalAddCreneau({ isOpen, onClose }) {
                 </FormControl>
 
                 <FormControl mt={4} isRequired>
-                <FormLabel>Motif de la consultation</FormLabel>
-                <Input placeholder="Motif" name="motif" value={creneauData.motif} onChange={handleChange} />
+                    <FormLabel>Motif de la consultation</FormLabel>
+                    <Input placeholder="Motif" name="motif" value={creneauData.motif} onChange={handleChange} />
                 </FormControl>
             </ModalBody>
 
