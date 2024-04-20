@@ -20,7 +20,7 @@ class AppointmentsAPI {
     }
 
     static async addAppointment(appointmentData) {
-        const url = 'http://localhost:3000/creneaux/add';
+        const url = 'http://localhost:3000/consultations/add';
         try {
             const response = await fetch(url, {
                 method: 'POST',
