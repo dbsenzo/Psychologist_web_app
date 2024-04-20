@@ -67,9 +67,9 @@ function ModalAddPatient({isOpen, onClose}) {
     return isValid;
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (isFormValid()) {
-      ClientsAPI.addClient(formData)
+      await ClientsAPI.addClient(formData)
         .then(() => {
           notify({
               title: "Succès",

@@ -89,8 +89,8 @@ export function Reserver() {
             </Box>
 
             {/* Modals */}
-            <ModalAddPatient isOpen={isAddPatientOpen} onClose={onAddPatientClose}/>
-            <ModalUpdatePatient isOpen={isUpdatePatientOpen} onClose={onUpdatePatientClose} patient={selectedPatient}/>
+            <ModalAddPatient isOpen={isAddPatientOpen} onClose={() => (onAddPatientClose(),fetchPatientsObject())}/>
+            <ModalUpdatePatient isOpen={isUpdatePatientOpen} onClose={() => (onUpdatePatientClose(),fetchPatientsObject()) } patient={selectedPatient}/>
             <ModalConfirm
                 isOpen={isConfirmOpen}
                 onClose={onConfirmClose}

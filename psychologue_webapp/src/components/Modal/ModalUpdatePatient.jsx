@@ -63,7 +63,7 @@ function ModalUpdatePatient({ isOpen, onClose, patient }) {
     }));
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     const updateData = {
       ...formData,
       IdPatient: patient.id
@@ -74,7 +74,7 @@ function ModalUpdatePatient({ isOpen, onClose, patient }) {
       updateData.Profession = null;
     }
 
-    ClientsAPI.updateClient(patient.id, updateData)
+    await ClientsAPI.updateClient(patient.id, updateData)
       .then(() => {
         notify({
             title: "Succès",
@@ -89,6 +89,7 @@ function ModalUpdatePatient({ isOpen, onClose, patient }) {
               status: "error"
           });
       });
+      onClose();
   };
 
   return (
