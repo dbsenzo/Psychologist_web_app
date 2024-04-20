@@ -8,9 +8,19 @@ export function ChartClient({chartName, pourcentage}) {
   const chartRef = useRef(null);
 
   const getPourcentageColor = () => {
+    /*
+    switch(pourcentage){
+        case pourcentage === 0:
+          console.log(pourcentage, '==')
+          return { pourcentage: pourcentage, sign: "+", color: 'gray', data: [0,0,0] }
+        case pourcentage > 0:
+          return { pourcentage: Math.abs(pourcentage), sign: "+", color: 'green', data: [5,3,11] }
+        case pourcentage < 0:
+          return { pourcentage: Math.abs(pourcentage), sign: "-", color: 'red', data: [11,3,5] }
+    }*/
     return pourcentage > 0
       ? { pourcentage: pourcentage, sign: "+", color: 'green', data: [5,3,11] }
-      : { pourcentage: Math.abs(pourcentage), sign: "-", color: 'red', data: [11,3,5] }; // Make sure pourcentage is always positive here
+      : (pourcentage === 0 ? { pourcentage: pourcentage, sign: "+", color: 'gray', data: [0,0,0] } : { pourcentage: Math.abs(pourcentage), sign: "-", color: 'red', data: [11,3,5] }); // Make sure pourcentage is always positive here
   }
 
   const pourcentageObject = getPourcentageColor();

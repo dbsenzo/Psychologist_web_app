@@ -26,19 +26,28 @@ export function Homepage(){
     return(
 
       <>
-        <Box display={'flex'} flexDirection={'column'} width={"100%"} minWidth={"840px"} gap={"20px"} marginInline={'10px'} marginBottom={"20px"}>
+        <Box display={'flex'} flexDirection={'column'} width={"100%"} minWidth={"840px"} gap={"20px"} marginBottom={"20px"}>
             <Box margin={"20px 0px 40px 0px"}>
               <BreadcrumbCustom actualPage={"Accueil"}/>
               <Text fontWeight={600}>Dashboard</Text>
             </Box>
     
-            <Box display={'flex'} width={'100%'} justifyContent={'center'} gap={'10px'}>
-              <BoxOne width={"33%"} height={'fit-content'} component={<ChartClient chartName={"Clients"} pourcentage={parseInt(pourcentageClients[0]?.Pourcentage) || 0} />}/>
-              <BoxOne width={"33%"} height={'fit-content'} component={<ChartClient chartName={"Réservations"} pourcentage={parseInt(pourcentageAppointments[0]?.Pourcentage) || 0}/>}/>
-              <BoxOne width={"33%"} height={'fit-content'} component={<ChartClient chartName={"Charges"} pourcentage={-10}/>}/>
+            <Box display={'flex'} flexDirection={'column'} width={"100%"} minWidth={"840px"} gap={"20px"} marginBottom={"20px"}>
+              <Box display={'flex'} width={'100%'} justifyContent={'space-between'} gap={'10px'}>
+                <Box flex={1} minW="0"> {/* Assurez-vous que les box peuvent rétrécir jusqu'à 0 */}
+                  <BoxOne height={'fit-content'} component={<ChartClient chartName={"Clients"} pourcentage={parseInt(pourcentageClients[0]?.Pourcentage) || 0} />}/>
+                </Box>
+                <Box flex={1} minW="0">
+                  <BoxOne height={'fit-content'} component={<ChartClient chartName={"Charges"} pourcentage={-10}/>}/>
+                </Box>
+                <Box flex={1} minW="0">
+                  <BoxOne height={'fit-content'} component={<ChartClient chartName={"Réservations"} pourcentage={parseInt(pourcentageAppointments[0]?.Pourcentage) || 0}/>}/>
+                </Box>
+              </Box>
             </Box>
 
-            <BoxOne width={"100%"} component={<Calendar/>}/>
+
+            <BoxOne width={"100%"} component={<Calendar clientId={null} addClient={true}/>}/>
             
         </Box>
 

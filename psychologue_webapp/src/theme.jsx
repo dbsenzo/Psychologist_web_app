@@ -16,11 +16,19 @@ const theme = extendTheme({
     primary: 'rgba(75,192,192,0.5)', // Exemple de couleur primaire
     secondary: 'rgba(75,192,192,0.15)', // Exemple de couleur secondaire
     buttonBackground: 'rgba(75,192,192,1)', // Définition de la couleur spécifique des boutons
+    textColor: "rgba(75,192,192,1)"
   },
   components: {
     Text: {
         baseStyle: {
             color: 'black'
+        },
+        variant: {
+            hoverBlue: {
+              _hover: {
+                bg: 'rgba(75,192,192,0.5)'
+              }
+            }
         }
 
     },

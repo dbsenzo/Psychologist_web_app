@@ -3,14 +3,17 @@ import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import AppointmentsAPI from '../../services/AppointmentsAPI';
-import moment from 'moment'; // Import moment
-import { Box, Text } from '@chakra-ui/react';
-import { useEffect, useState } from 'react';
+import moment from 'moment';
+import PropTypes from 'prop-types';
+import { AuthContext } from '../../context/AuthContext';
+import { Box, Button, Text } from '@chakra-ui/react';
+import { useContext, useEffect, useState } from 'react';
 
 
-export function Calendar() {
+export function Calendar({clientId = null, addClient = false}) {
 
   const [events, setEvents] = useState([]);
+  const { logout } = useContext(AuthContext);
 
   const highlightCurrentDay = ({ date, el }) => {
     if (moment().isSame(date, 'day')) {
@@ -19,7 +22,7 @@ export function Calendar() {
   };
 
   const fetchEvents = async () => {
-    setEvents(await AppointmentsAPI.getAppointments());
+    setEvents(await AppointmentsAPI.getAppointments(clientId));
   }
   useEffect(() => {
     fetchEvents();
@@ -31,6 +34,12 @@ export function Calendar() {
   // Define custom button and headerToolbar configuration here.
   const headerToolbar = {
     left: 'prev,next myCustomButton',
+    center: 'title',
+    right: 'dayGridMonth,timeGridWeek',
+  };
+
+  const headerToolbarWithoutButton = {
+    left: 'prev,next',
     center: 'title',
     right: 'dayGridMonth,timeGridWeek',
   };
@@ -64,7 +73,10 @@ export function Calendar() {
 
   return (
     <Box as='div' display={'flex'} flexDirection={'column'} gap={"20px"}>
-      <Text fontSize={"24px"} fontWeight={600}>Mon calendrier</Text>
+      <Box as='div' display={'flex'} justifyContent={'space-between'}>
+        <Text fontSize={"24px"} fontWeight={600}>Mon calendrier</Text>
+        {addClient ? null : <Button variant={'ghost'} onClick={logout}>Deconnexion</Button>}
+      </Box>
       <FullCalendar
         // editable
         // eventDragStop={(data) => console.log(data.event._instance.range)}
@@ -84,9 +96,14 @@ export function Calendar() {
         eventContent={renderEventContent}
         views={views}
         customButtons={customButtons} // Apply custom buttons here.
-        headerToolbar={headerToolbar} // Apply header toolbar configuration here.
+        headerToolbar={addClient ? headerToolbar : headerToolbarWithoutButton} // Apply header toolbar configuration here.
         
       />
     </Box>
   );
+}
+
+
+Calendar.propTypes = {
+  clientId: PropTypes.number,
 }
