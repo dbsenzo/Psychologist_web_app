@@ -74,28 +74,25 @@ router.get('/finish/:id', (req, res) => {
 });
 
 router.put('/update/:id', (req, res) => {
-  const { IdPatient, IdCalendrier, Retard, Prix, ModeDeReglement, IndicateurAnxiete, NombreDePersonnes, Observations } = req.body;
-  const consultation = {
-    IdPatient,
-    IdCalendrier,
-    Retard,
-    Prix,
-    ModeDeReglement,
-    IndicateurAnxiete,
-    NombreDePersonnes,
-    Observations,
-    IdCalendrier,
-    IdPatient
-  };
+  const { IdPatient, IdCalendrier, NombreDePersonnes, DateCreneau } = req.body;
+  var sqlCr = "UPDATE calendrier SET Creneau = ? WHERE IdCalendrier = ?";
+  req.connection.query(sqlCr, [DateCreneau, IdCalendrier], (err, result) => {
+    if (err) {
+      console.error('Erreur', err);
+      res.status(500).send("Erreur lors de la modification du créneau");
+      return;
+    }
+    res.send("ok");
+  });
 
-  const sql = "UPDATE consulter SET IdPatient=?, IdCalendrier=?, Retard=?, Prix=?, ModeDeReglement=?, IndicateurAnxiete=?, NombreDePersonnes=?, Observations=? WHERE IdCalendrier = ? AND IdPatient = ?"
-  req.connection.query(sql, consultation, (err, result) => {
+  const sql = "UPDATE consulter SET IdPatient=?, IdCalendrier=?, NombreDePersonnes=?, WHERE IdCalendrier = ?";
+  req.connection.query(sql, [IdPatient, IdCalendrier, NombreDePersonnes, IdCalendrier], (err, result) => {
     if (err) {
       console.error('Erreur', err);
       res.status(500).send('Erreur lors de la modification de la consultation');
       return;
     }
-    res.send('Consultation modifiée avec succès');
+    res.send({message: 'Consultation modifiée avec succès'});
   });
 });
 
