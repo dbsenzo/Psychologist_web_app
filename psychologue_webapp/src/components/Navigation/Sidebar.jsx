@@ -21,7 +21,7 @@ export function Sidebar() {
                 <Text fontSize={"x-large"} color={"2D3748"} fontWeight={500}>Navigation</Text>
                 <Box as="ul" display={"flex"} gap={"20px"} flexDirection={"column"}>
                     <Li text={"Accueil"} image={"/stats.svg"} to={"/"}/>
-                    <Li text={"Rendez-vous"} image={"/options.svg"} />
+                    <Li text={"Rendez-vous"} image={"/options.svg"} to={'/manageAppointments'} />
                     <Li text={"Patients"} image={"/appointment.svg"} to={'/reservation'}/>
                 </Box>
                 <Box display={'flex'} flexDirection={'column'} justifyContent={'end'} pb={'5px'} height={'100%'}>

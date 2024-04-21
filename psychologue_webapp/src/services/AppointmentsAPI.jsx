@@ -65,6 +65,74 @@ class AppointmentsAPI {
         }
     }    
 
+    static async getAppointmentsNotFinished() {
+        let url = `http://localhost:3000/consultations/nonfinis`;
+        
+        try {
+            const response = await fetch(url, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+            
+            if (!response.ok) {
+                throw new Error("HTTP error " + response.status);
+            }
+            const data = await response.json();
+            console.log(data);
+            return data;
+        } catch (error) {
+            console.error('Unable to load free appointments:', error.message);
+            throw error;  // It's usually better to throw the error to allow handling it in the calling context.
+        }
+    } 
+
+    static async deleteAppointment(idCalendrier) {
+        const url = `http://localhost:3000/consultations/delete/${idCalendrier}`;
+
+        try {
+            const response = await fetch(url, {
+                method: 'DELETE'
+            });
+            
+            if (!response.ok) {
+                throw new Error("HTTP error " + response.status);
+            }
+            return await response.json();
+        } catch (error) {
+            console.error('Unable to delete the appointment:', error.message);
+            throw error;
+        }
+    }
+    
+
+    static async updateAppointment(idCalendrier, appointmentData) {
+        const url = `http://localhost:3000/consultations/update/${idCalendrier}`;
+        
+        try {
+            const response = await fetch(url, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(appointmentData)
+            });
+            
+            if (!response.ok) {
+                throw new Error("HTTP error " + response.status);
+            }
+            const data = await response.json();
+            console.log("Update success:", data);
+            return data;
+        } catch (error) {
+            console.error('Failed to update the appointment:', error.message);
+            throw error;  // It's usually better to throw the error to allow handling it in the calling context.
+        }
+    }
+    
+    
+
 }
 
 export default AppointmentsAPI;

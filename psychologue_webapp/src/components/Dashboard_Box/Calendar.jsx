@@ -67,10 +67,16 @@ export function Calendar({clientId = null, addClient = false}) {
   function renderEventContent(eventInfo) {
     return (
       <>
-        <p><b>{eventInfo.timeText}</b> | <i>{eventInfo.event.title}</i></p>
+        <Box display={'flex'} flexDirection={'column'}>
+          <p>
+            <b>{eventInfo.timeText}</b> | <i>{eventInfo.event.title}</i>
+          </p>
+          <p>Patient(s) : {eventInfo.event.extendedProps.NombreDePersonnes}</p> {/* Accès correct à la propriété */}
+        </Box>
       </>
     );
   }
+
 
   return (
     <Box as='div' display={'flex'} flexDirection={'column'} gap={"20px"}>
@@ -81,6 +87,7 @@ export function Calendar({clientId = null, addClient = false}) {
       <FullCalendar
         // editable
         // eventDragStop={(data) => console.log(data.event._instance.range)}
+        timeZone='Europe/Paris'
         dayCellDidMount={highlightCurrentDay}
         allDaySlot={false}
         plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}

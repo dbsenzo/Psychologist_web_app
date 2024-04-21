@@ -13,7 +13,7 @@ router.get('/libres', (req, res) => {
   const creneaux = [];
 
   // Générer les créneaux de 8h à 20h pour la date donnée
-  for (let hour = 8; hour <= 20; hour++) {
+  for (let hour = 8; hour <= 19; hour++) {
     const time = moment.tz(`${dateCreneau} ${hour}:00`, "YYYY-MM-DD HH:mm", timeZone);
     creneaux.push(time.format('YYYY-MM-DD HH:mm:ss'));
   }

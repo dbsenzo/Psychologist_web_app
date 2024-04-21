@@ -44,6 +44,26 @@ function ModalAddPatient({isOpen, onClose}) {
     }));
   };
 
+  const resetModal = () => {
+    // Réinitialisez les données du formulaire à leurs valeurs initiales
+    setFormData({
+      prenom: '',
+      nom: '',
+      adresse: '',
+      profession: '',
+      sexe: '',
+      moyenDeConnaissance: '',
+      dateNaissance: ''
+    });
+  
+    // Réinitialisez les erreurs du formulaire
+    setFormErrors({});
+    
+    // Fermez la modal
+    onClose();
+  };
+  
+
   const isFormValid = () => {
     const errors = {};
     const today = new Date();
@@ -97,7 +117,7 @@ function ModalAddPatient({isOpen, onClose}) {
 
   return (
     <>
-      <Modal isOpen={isOpen} onClose={onClose}>
+      <Modal isOpen={isOpen} onClose={() => (onClose(), resetModal())}>
         <ModalOverlay />
         <ModalContent>
           <ModalHeader>Ajouter un patient</ModalHeader>

@@ -21,8 +21,12 @@ export const ClientsProvider = ({ children }) => {
         }
     };
 
+    const getClient = (idPatient) => {
+        return clients.find(client => client.id === idPatient);
+    }
+
     return (
-        <ClientsContext.Provider value={{ clients, setClients, fetchClients }}>
+        <ClientsContext.Provider value={{ clients, setClients, fetchClients, getClient }}>
             {children}
         </ClientsContext.Provider>
     );

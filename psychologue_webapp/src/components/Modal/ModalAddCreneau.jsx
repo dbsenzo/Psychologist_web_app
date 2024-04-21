@@ -12,7 +12,12 @@ import {
   FormLabel,
   Input,
   Select,
-  useToast
+  useToast,
+  NumberInput,
+  NumberDecrementStepper,
+  NumberIncrementStepper,
+  NumberInputField,
+  NumberInputStepper
 } from '@chakra-ui/react';
 import PropTypes from 'prop-types';
 import { useClients } from '../../context/ClientsContext';
@@ -24,31 +29,45 @@ function ModalAddCreneau({ isOpen, onClose }) {
         dateCreneau: '',
         heureCreneau: '',
         idPatient: '',
-        motif: ''
+        responsableLegal: '',
+        nombreDePersonnes: 1,
     });
+
+    const [isMajor, setIsMajor] = useState(true);
 
     const [availableHours, setAvailableHours] = useState([]);
 
     const { clients } = useClients();
     const toast = useToast();
 
-    const handleChange = async (e) => {
+    const handleChange = (e) => {
         const { name, value } = e.target;
         setCreneauData(prevState => ({
             ...prevState,
             [name]: value
         }));
-    
-        if (name === "dateCreneau" && value) {
+
+        if (name === "dateCreneau") {
+            const dayOfWeek = new Date(value).getDay();
+            if (dayOfWeek === 0) { // 0 est Dimanche
+                toast({
+                    title: "Date invalide",
+                    description: "Les rendez-vous ne peuvent pas être pris un dimanche.",
+                    status: "error",
+                    duration: 5000,
+                    isClosable: true
+                });
+                return; // Stop further execution or clear the date
+            }
             handleGetFreeAppointments(value);
         }
-    };
-    
 
-    const isFormValid = () => {
-        // Validation logic here, e.g., check if all fields are filled
-        return Object.values(creneauData).every(value => value);
+        if (name === "idPatient") {
+            const selectedClient = clients.find(client => client.id === value);
+            setIsMajor(selectedClient.isMajor);
+        }
     };
+
 
     const handleGetFreeAppointments = async (date) => {
         try {
@@ -77,9 +96,36 @@ function ModalAddCreneau({ isOpen, onClose }) {
         }
     };
     
+    const resetModal = () => {
+        setCreneauData({
+            dateCreneau: '',
+            heureCreneau: '',
+            idPatient: '',
+            responsableLegal: '',
+            nombreDePersonnes: 1,
+        });
+        setIsMajor(true);
+        setAvailableHours([]);
+    };
 
-    const handleSubmit = async () => {
-        if (!isFormValid()) {
+    function validateForm() {
+        // Vérifier si la date est un dimanche
+        const selectedDate = new Date(creneauData.dateCreneau);
+        if (selectedDate.getDay() === 0) { // Dimanche
+            toast({
+                title: "Erreur",
+                description: "Les rendez-vous ne peuvent pas être pris un dimanche.",
+                status: "error",
+                duration: 5000,
+                isClosable: true
+            });
+            return false;
+        }
+    
+        // Vérification complète des champs requis
+        if (!(isMajor ? 
+            creneauData.dateCreneau && creneauData.heureCreneau && creneauData.idPatient :
+            creneauData.dateCreneau && creneauData.heureCreneau && creneauData.idPatient && creneauData.responsableLegal)) {
             toast({
                 title: "Erreur",
                 description: "Veuillez remplir tous les champs requis.",
@@ -87,53 +133,65 @@ function ModalAddCreneau({ isOpen, onClose }) {
                 duration: 5000,
                 isClosable: true
             });
-            return;
+            return false;
         }
     
-        // Combine date and time into a single ISO string for the backend
-        const dateMoment = moment.tz(creneauData.dateCreneau + 'T' + creneauData.heureCreneau, "YYYY-MM-DDTHH:mm", "Europe/Paris"); // Assurez-vous de spécifier le bon fuseau horaire
-        const completeDate = dateMoment.toISOString();
+        return true;
+    }
     
-        const dataToSend = {
+    function prepareDataToSend() {
+        const dateMoment = moment.tz(`${creneauData.dateCreneau}T${creneauData.heureCreneau}`, "YYYY-MM-DDTHH:mm", "Europe/Paris");
+        return {
             IdPatient: creneauData.idPatient,
-            DateCreneau: completeDate, // Assurez-vous que le backend peut gérer ce format
-            Prix: 0, // Assume no cost specified, adjust accordingly
-            NombreDePersonnes: 1, // Default value, adjust if needed
-            Motif: creneauData.motif
+            DateCreneau: dateMoment.format('YYYY-MM-DDTHH:mm:ss'),
+            Prix: 0,
+            NombreDePersonnes: creneauData.nombreDePersonnes,
+            ResponsableLegal: isMajor ? null : creneauData.responsableLegal
         };
+    }
     
-        await AppointmentsAPI.addAppointment(dataToSend)
-        .then(() => {
-            toast({
+    function handleResponse() {
+        toast({
             title: "Succès",
             description: "Créneau ajouté avec succès.",
             status: "success",
             duration: 5000,
             isClosable: true
-            });
-            onClose();
-        })
-        .catch(error => {
-            toast({
+        });
+        onClose();
+    }
+    
+    function handleError(error) {
+        toast({
             title: "Erreur",
             description: error.message || "Une erreur s'est produite lors de l'ajout du créneau.",
             status: "error",
             duration: 5000,
             isClosable: true
-            });
         });
+    }
+    
+    const handleSubmit = async () => {
+        if (!validateForm()) return;
+    
+        const dataToSend = prepareDataToSend();
+    
+        await AppointmentsAPI.addAppointment(dataToSend)
+            .then(handleResponse)
+            .catch(handleError);
     };
+    
 
     return (
-        <Modal isOpen={isOpen} onClose={onClose}>
+        <Modal isOpen={isOpen} onClose={() => (onClose(),resetModal())}>
             <ModalOverlay />
             <ModalContent>
             <ModalHeader>Ajouter un créneau</ModalHeader>
             <ModalCloseButton />
             <ModalBody pb={6}>
                 <FormControl isRequired>
-                <FormLabel>Date du créneau</FormLabel>
-                <Input type="date" name="dateCreneau" value={creneauData.dateCreneau} onChange={handleChange} />
+                    <FormLabel>Date du créneau</FormLabel>
+                    <Input type="date" name="dateCreneau" value={creneauData.dateCreneau} onChange={handleChange} min={new Date().toISOString().split('T')[0]} />
                 </FormControl>
 
                 <FormControl mt={4} isRequired>
@@ -156,9 +214,24 @@ function ModalAddCreneau({ isOpen, onClose }) {
                     </Select>
                 </FormControl>
 
-                <FormControl mt={4} isRequired>
-                    <FormLabel>Motif de la consultation</FormLabel>
-                    <Input placeholder="Motif" name="motif" value={creneauData.motif} onChange={handleChange} />
+                {!isMajor && (
+                    <FormControl mt={4} isRequired>
+                        <FormLabel>Responsable Légal</FormLabel>
+                        <Input placeholder="Nom du responsable légal" name="responsableLegal" value={creneauData.responsableLegal} onChange={handleChange} />
+                    </FormControl>
+                )}
+            
+                <FormControl isRequired mt={4} width={'fit-content'}>
+                    <FormControl mt={4} isRequired>
+                        <FormLabel>Nombre de patient(s) présent :</FormLabel>
+                        <NumberInput min={1} max={3} defaultValue={creneauData.nombreDePersonnes} precision={0} onChange={(valueString) => setCreneauData(prev => ({ ...prev, nombreDePersonnes: parseInt(valueString, 10) }))}>
+                            <NumberInputField name="nombreDePersonnes" />
+                            <NumberInputStepper>
+                                <NumberIncrementStepper />
+                                <NumberDecrementStepper />
+                            </NumberInputStepper>
+                        </NumberInput>
+                    </FormControl>
                 </FormControl>
             </ModalBody>
 

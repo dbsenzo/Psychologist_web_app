@@ -12,6 +12,7 @@ import ProtectedRoute from './components/Navigation/ProtectedRoute';
 import NotFoundPage from './components/Navigation/NotFound';
 import { ClientHomepage } from './page/ClientHomepage';
 import { ClientsProvider } from './context/ClientsContext';
+import ManageAppointments from './page/ManageAppointments';
 
 
 const HeaderLayout = () => {
@@ -55,6 +56,10 @@ const routerAdmin = [
       {
         path: 'reservation',
         element: <ProtectedRoute adminOnly><Reserver/></ProtectedRoute>
+      },
+      {
+        path: 'manageAppointments',
+        element: <ProtectedRoute adminOnly><ManageAppointments/></ProtectedRoute>
       },
     ]
   }

@@ -19,22 +19,49 @@ router.get('/', (req, res) => {
 // insérer une consultation
 router.post('/add', (req, res) => {
   const { IdPatient, DateCreneau, Prix, NombreDePersonnes } = req.body;
-  var idcal = uuidv4();
-    req.connection.query('INSERT INTO calendrier(IdCalendrier, Creneaux) VALUES (?,?)', [idcal, DateCreneau], (err, result) => {
+  const idCal = uuidv4();
+
+  // Commencer une transaction
+  req.connection.beginTransaction(err => {
       if (err) {
-        console.log('Erreur', err);
+          console.error('Erreur lors du démarrage de la transaction:', err);
+          return res.status(500).send({ message: 'Erreur lors du démarrage de la transaction: ' + err.sqlMessage });
       }
-    })
-    const sql = 'INSERT INTO consulter (IdPatient, IdCalendrier, Prix, NombreDePersonnes) VALUES (?,?,?,?)';
-    req.connection.query(sql, [IdPatient, idcal, Prix, NombreDePersonnes], (err, result) => {
-    if (err) {
-      console.error('Erreur', err);
-      res.status(500).send({message: 'Erreur lors de l\'insertion de la consultation: ' + err.sqlMessage});
-      return;
-    }
-    res.send({message: 'Créneau ajoutée avec succès'});
+
+      // Première insertion dans la table 'calendrier'
+      req.connection.query('INSERT INTO calendrier (IdCalendrier, Creneaux) VALUES (?, ?)', [idCal, DateCreneau], (err, result) => {
+          if (err) {
+              console.error('Erreur lors de l\'insertion dans calendrier:', err);
+              return req.connection.rollback(() => {
+                  res.status(500).send({ message: 'Erreur lors de l\'insertion dans le calendrier: ' + err.sqlMessage });
+              });
+          }
+
+          // Deuxième insertion dans la table 'consulter'
+          const sql = 'INSERT INTO consulter (IdPatient, IdCalendrier, Prix, NombreDePersonnes) VALUES (?, ?, ?, ?)';
+          req.connection.query(sql, [IdPatient, idCal, Prix, NombreDePersonnes], (err, result) => {
+              if (err) {
+                  console.error('Erreur lors de l\'insertion dans consulter:', err);
+                  return req.connection.rollback(() => {
+                      res.status(500).send({ message: 'Erreur lors de l\'insertion de la consultation: ' + err.sqlMessage });
+                  });
+              }
+
+              // Valider la transaction
+              req.connection.commit(err => {
+                  if (err) {
+                      console.error('Erreur lors de la validation de la transaction:', err);
+                      return req.connection.rollback(() => {
+                          res.status(500).send({ message: 'Erreur lors de la validation de la transaction: ' + err.sqlMessage });
+                      });
+                  }
+                  res.send({ message: 'Créneau ajouté avec succès' });
+              });
+          });
+      });
   });
 });
+
 
 router.get('/finis', (req, res) => {
   var sql = "select concat(`psychologue`.`patient`.`Nom`,' ',substr(`psychologue`.`patient`.`Prenom`,1,1),'.') AS `title`,date_format(`psychologue`.`calendrier`.`Creneaux`,'%Y-%m-%dT%H:%i:%sZ') AS `start` from ((`psychologue`.`calendrier` join `psychologue`.`consulter` on(`psychologue`.`calendrier`.`IdCalendrier` = `psychologue`.`consulter`.`IdCalendrier`)) join `psychologue`.`patient` on(`psychologue`.`consulter`.`IdPatient` = `psychologue`.`patient`.`IdPatient`)) WHERE consulter.isFinished = 1";
@@ -74,27 +101,29 @@ router.get('/finish/:id', (req, res) => {
 });
 
 router.put('/update/:id', (req, res) => {
-  const { IdPatient, IdCalendrier, NombreDePersonnes, DateCreneau } = req.body;
-  var sqlCr = "UPDATE calendrier SET Creneau = ? WHERE IdCalendrier = ?";
+  const { idPatient, IdCalendrier, NombreDePersonnes, DateCreneau } = req.body;
+  console.log(req);
+  // Updating the calendrier table
+  var sqlCr = "UPDATE calendrier SET Creneaux = ? WHERE IdCalendrier = ?";
   req.connection.query(sqlCr, [DateCreneau, IdCalendrier], (err, result) => {
-    if (err) {
-      console.error('Erreur', err);
-      res.status(500).send("Erreur lors de la modification du créneau");
-      return;
-    }
-    res.send("ok");
-  });
-
-  const sql = "UPDATE consulter SET IdPatient=?, IdCalendrier=?, NombreDePersonnes=?, WHERE IdCalendrier = ?";
-  req.connection.query(sql, [IdPatient, IdCalendrier, NombreDePersonnes, IdCalendrier], (err, result) => {
-    if (err) {
-      console.error('Erreur', err);
-      res.status(500).send('Erreur lors de la modification de la consultation');
-      return;
-    }
-    res.send({message: 'Consultation modifiée avec succès'});
+      if (err) {
+          console.error('Erreur updating calendrier:', err);
+          res.status(500).send("Erreur lors de la modification du créneau");
+          return;
+      }
+      // If calendrier update succeeds, then update consulter
+      const sql = "UPDATE consulter SET IdPatient = ?, NombreDePersonnes = ? WHERE IdCalendrier = ?";
+      req.connection.query(sql, [idPatient, NombreDePersonnes, IdCalendrier], (err, result) => {
+          if (err) {
+              console.error('Erreur updating consulter:', err);
+              res.status(500).send('Erreur lors de la modification de la consultation');
+              return;
+          }
+          res.send({ message: 'Consultation modifiée avec succès' });
+      });
   });
 });
+
 
 router.delete('/delete/:idCalendrier', (req, res) => {
   const { idCalendrier } = req.params;
