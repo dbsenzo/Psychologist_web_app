@@ -109,6 +109,16 @@ router.delete('/delete/:id', (res, req) => {
     }
     res.send('Consultation supprimée');
   });
+
+  var sqlCreneau = "DELETE FROM calendrier WHERE IdCalendrier = ?";
+  req.connection.query(sqlCreneau, req.params.id, (err, result) => {
+    if (err){
+      console.error('Erreur', err);
+      res.status(500).send('Erreur lors de la suppression du créneau');
+      return;
+    }
+    res.send("Créneau supprimé avec succès");
+  });
 });
 
 module.exports = router;
