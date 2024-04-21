@@ -99,26 +99,28 @@ router.put('/update/:id', (req, res) => {
   });
 });
 
-router.delete('/delete/:id', (res, req) => {
-  var sql = "DELETE FROM consulter WHERE IdCalendrier = ?";
-  req.connection.query(sql, req.params.id, (err, result) => {
-    if (err) {
-      console.error('Erreur', err);
-      res.status(500).send('Erreur lors de la suppression de la consultation');
-      return;
-    }
-    res.send('Consultation supprimée');
-  });
+router.delete('/delete/:idCalendrier', (req, res) => {
+  const { idCalendrier } = req.params;
+  const sqlDeleteConsultation = "DELETE FROM consulter WHERE IdCalendrier = ?";
+  const sqlDeleteCreneau = "DELETE FROM calendrier WHERE IdCalendrier = ?";
 
-  var sqlCreneau = "DELETE FROM calendrier WHERE IdCalendrier = ?";
-  req.connection.query(sqlCreneau, req.params.id, (err, result) => {
-    if (err){
-      console.error('Erreur', err);
-      res.status(500).send('Erreur lors de la suppression du créneau');
-      return;
-    }
-    res.send("Créneau supprimé avec succès");
+  // First delete consultation details
+  req.connection.query(sqlDeleteConsultation, [idCalendrier], (err, result) => {
+      if (err) {
+          console.error('Erreur', err);
+          return res.status(500).send('Erreur lors de la suppression de la consultation');
+      }
+
+      // Then delete the calendar slot
+      req.connection.query(sqlDeleteCreneau, [idCalendrier], (err, result) => {
+          if (err){
+              console.error('Erreur', err);
+              return res.status(500).send('Erreur lors de la suppression du créneau');
+          }
+          res.send({message: "Créneau et consultation supprimés avec succès"});
+      });
   });
 });
+
 
 module.exports = router;
