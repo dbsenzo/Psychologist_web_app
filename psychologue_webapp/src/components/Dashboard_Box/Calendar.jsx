@@ -107,7 +107,7 @@ export function Calendar({clientId = null, addClient = false}) {
         headerToolbar={addClient ? headerToolbar : headerToolbarWithoutButton} // Apply header toolbar configuration here.
         
       />
-      <ModalAddCreneau isOpen={isAddCreneauOpen} onClose={onAddCreneauClose} />
+      <ModalAddCreneau isOpen={isAddCreneauOpen} onClose={onAddCreneauClose} fetchCreneau={fetchEvents} />
     </Box>
     
   );

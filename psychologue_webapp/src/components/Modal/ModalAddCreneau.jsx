@@ -24,7 +24,7 @@ import { useClients } from '../../context/ClientsContext';
 import AppointmentsAPI from '../../services/AppointmentsAPI';
 import moment from 'moment-timezone';
 
-function ModalAddCreneau({ isOpen, onClose }) {
+function ModalAddCreneau({ isOpen, onClose, fetchCreneau }) {
     const [creneauData, setCreneauData] = useState({
         dateCreneau: '',
         heureCreneau: '',
@@ -159,6 +159,7 @@ function ModalAddCreneau({ isOpen, onClose }) {
             duration: 5000,
             isClosable: true
         });
+        fetchCreneau();
         resetModal();
     }
     
@@ -249,7 +250,8 @@ function ModalAddCreneau({ isOpen, onClose }) {
 
 ModalAddCreneau.propTypes = {
   isOpen: PropTypes.bool,
-  onClose: PropTypes.func
+  onClose: PropTypes.func,
+  fetchCreneau: PropTypes.func
 };
 
 export default ModalAddCreneau;
