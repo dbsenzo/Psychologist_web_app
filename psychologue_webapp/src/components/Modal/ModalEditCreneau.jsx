@@ -151,7 +151,7 @@ function ModalEditCreneau({ isOpen, onClose, appointment }) {
                     </FormControl>
                     <FormControl mt={4} isRequired>
                         <FormLabel>Number of People</FormLabel>
-                        <NumberInput min={1} max={3} defaultValue={creneauData.NombreDePersonnes} precision={0} onChange={(valueString) => setCreneauData(prev => ({ ...prev, NombreDePersonnes: parseInt(valueString, 10) }))}>
+                        <NumberInput min={1} max={3} value={creneauData.NombreDePersonnes} precision={0} onChange={(valueString) => setCreneauData(prev => ({ ...prev, NombreDePersonnes: parseInt(valueString, 10) }))}>
                             <NumberInputField name="NombreDePersonnes" />
                             <NumberInputStepper>
                                 <NumberIncrementStepper />
