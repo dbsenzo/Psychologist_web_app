@@ -18,13 +18,16 @@ import { EditIcon, DeleteIcon, CheckIcon } from '@chakra-ui/icons';
 import ModalConfirm from '../components/Modal/ModalConfirm';
 import AppointmentsAPI from '../services/AppointmentsAPI';
 import { useNotification } from '../services/NotificationService';
+import ModalFinishCreneau from '../components/Modal/ModalFinishCreneau';
 
 function ManageAppointments() {
     const [appointments, setAppointments] = useState([]);
     const { isOpen: isEditOpen, onOpen: onEditOpen, onClose: onEditClose } = useDisclosure();
     const { isOpen: isConfirmOpen, onOpen: onConfirmOpen, onClose: onConfirmClose } = useDisclosure();
+    const { isOpen: isFinishOpen, onOpen: onFinishOpen, onClose: onFinishClose } = useDisclosure();
     const [selectedAppointment, setSelectedAppointment] = useState(null);
     const [appointmentToDelete, setAppointmentToDelete] = useState(null);
+    const [appointmentToFinish, setAppointmentToFinish] = useState(null);
     const { notify } = useNotification();
 
   useEffect(() => {
@@ -49,14 +52,16 @@ function ManageAppointments() {
   }
 
   const handleEdit = (appointment) => {
+    console.log(appointment)
     setSelectedAppointment(appointment);
     onEditOpen();
   };
 
   const handleFinish = async (id) => {
-    //await AppointmentsAPI.finishAppointment(id); // Adjust API method as needed
-    fetchAppointments(); // Refresh the list
-  };
+    setAppointmentToFinish(id)
+    onFinishOpen();
+};
+
 
   const handleSaveChanges = async () => {
     onEditClose();
@@ -102,6 +107,11 @@ const confirmDelete = async () => {
     }
 };
 
+useEffect(() => {
+    console.log('Appointment to finish ID:', appointmentToFinish); // Cela affichera l'ID chaque fois qu'il change
+}, [appointmentToFinish]);
+
+
 
 
   return (
@@ -129,7 +139,7 @@ const confirmDelete = async () => {
                 <Td>
                     <IconButton icon={<EditIcon />} onClick={() => handleEdit(appointment)} m={1} />
                     <IconButton icon={<DeleteIcon />} onClick={() => handleDeleteConfirm(appointment.IdCalendrier)} m={1} />
-                    <IconButton icon={<CheckIcon />} onClick={() => handleFinish(appointment.id)} m={1} />
+                    {appointment.isDone ? <IconButton icon={<CheckIcon />} onClick={() => handleFinish(appointment.IdCalendrier)} m={1} /> : null }
                 </Td>
                 </Tr>
             ))}
@@ -150,6 +160,13 @@ const confirmDelete = async () => {
             confirmText="Supprimer"
             confirmMessage="Êtes-vous sûr de vouloir supprimer ce rendez-vous ?"
         />
+        <ModalFinishCreneau
+            isOpen={isFinishOpen}
+            onClose={onFinishClose}
+            IdAppointment={appointmentToFinish}
+            fetchAppointments={fetchAppointments}
+        />
+
         </Box>
     </>
   );

@@ -87,7 +87,7 @@ router.get('/nonfinis', (req, res) => {
   });
 });
 
-router.get('/finish/:id', (req, res) => {
+router.put('/finish/:id', (req, res) => {
   const { Retard, ModeDeReglement, IndicateurAnxiete, Observations } = req.body;
   var sql = "UPDATE consulter SET isFinished = 1, Retard = ?, ModeDeReglement = ?, IndicateurAnxiete = ?, Observations = ? WHERE IdCalendrier = ?";
   req.connection.query(sql, [Retard, ModeDeReglement, IndicateurAnxiete, Observations, req.params.id], (err, result) => {
@@ -96,7 +96,7 @@ router.get('/finish/:id', (req, res) => {
       res.status(500).send('Erreur lors de la fin de la consultation');
       return;
     }
-    res.send('Consultation terminée');
+    res.send({message: 'Consultation terminée'});
   });
 });
 

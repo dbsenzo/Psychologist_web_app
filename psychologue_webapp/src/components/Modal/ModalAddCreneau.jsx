@@ -144,7 +144,7 @@ function ModalAddCreneau({ isOpen, onClose }) {
         return {
             IdPatient: creneauData.idPatient,
             DateCreneau: dateMoment.format('YYYY-MM-DDTHH:mm:ss'),
-            Prix: 0,
+            Prix: 45,
             NombreDePersonnes: creneauData.nombreDePersonnes,
             ResponsableLegal: isMajor ? null : creneauData.responsableLegal
         };

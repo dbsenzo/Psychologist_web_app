@@ -105,7 +105,7 @@ class AppointmentsAPI {
             throw error;
         }
     }
-    
+
 
     static async updateAppointment(idCalendrier, appointmentData) {
         const url = `http://localhost:3000/consultations/update/${idCalendrier}`;
@@ -130,6 +130,36 @@ class AppointmentsAPI {
             throw error;  // It's usually better to throw the error to allow handling it in the calling context.
         }
     }
+
+    static async finishAppointment(idCalendrier, appointmentDetails) {
+        const url = `http://localhost:3000/consultations/finish/${idCalendrier}`;
+        
+        try {
+            const response = await fetch(url, {
+                method: 'PUT', // Utilisation de PUT pour la mise à jour des données
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    Retard: appointmentDetails.retard,
+                    ModeDeReglement: appointmentDetails.paymentMode,
+                    IndicateurAnxiete: appointmentDetails.stress,
+                    Observations: appointmentDetails.observation
+                })
+            });
+            
+            if (!response.ok) {
+                throw new Error("HTTP error " + response.status);
+            }
+            const data = await response.json();
+            console.log("Consultation finish success:", data);
+            return data;  // Renvoie les données de la réponse pour confirmation
+        } catch (error) {
+            console.error('Failed to finish the appointment:', error.message);
+            throw error;  // Lève une exception pour permettre la gestion des erreurs dans le contexte appelant
+        }
+    }
+    
     
     
 
