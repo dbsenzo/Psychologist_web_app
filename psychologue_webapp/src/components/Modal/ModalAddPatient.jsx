@@ -17,7 +17,7 @@ import PropTypes from 'prop-types';
 import ClientsAPI from '../../services/ClientsAPI';
 import { useNotification } from '../../services/NotificationService';
 
-function ModalAddPatient({isOpen, onClose}) {
+function ModalAddPatient({ isOpen, onClose }) {
   const [formData, setFormData] = useState({
     prenom: '',
     nom: '',
@@ -45,7 +45,6 @@ function ModalAddPatient({isOpen, onClose}) {
   };
 
   const resetModal = () => {
-    // Réinitialisez les données du formulaire à leurs valeurs initiales
     setFormData({
       prenom: '',
       nom: '',
@@ -55,14 +54,9 @@ function ModalAddPatient({isOpen, onClose}) {
       moyenDeConnaissance: '',
       dateNaissance: ''
     });
-  
-    // Réinitialisez les erreurs du formulaire
     setFormErrors({});
-    
-    // Fermez la modal
     onClose();
   };
-  
 
   const isFormValid = () => {
     const errors = {};
@@ -92,100 +86,95 @@ function ModalAddPatient({isOpen, onClose}) {
       await ClientsAPI.addClient(formData)
         .then(() => {
           notify({
-              title: "Succès",
-              description: "Patient ajouté avec succès.",
-              status: "success"
+            title: "Succès",
+            description: "Patient ajouté avec succès.",
+            status: "success"
           });
+          resetModal();
         })
         .catch(error => {
-            notify({
-                title: "Error",
-                description: error.message || "Une erreur s'est produite.",
-                status: "error"
-            });
+          notify({
+            title: "Error",
+            description: error.message || "Une erreur s'est produite.",
+            status: "error"
+          });
         });
-        onClose();
     } else {
       notify({
-          title: "Attention",
-          description: "La modal n'est pas conforme.",
-          status: "warning"
+        title: "Attention",
+        description: "La modal n'est pas conforme.",
+        status: "warning"
       });
     }
   };
-  
 
   return (
-    <>
-      <Modal isOpen={isOpen} onClose={() => (onClose(), resetModal())}>
-        <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>Ajouter un patient</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody pb={6}>
-            <FormControl isRequired isInvalid={formErrors.nom}>
-              <FormLabel>Nom</FormLabel>
-              <Input placeholder="Nom" name="nom" value={formData.firstName} onChange={handleChange} />
-            </FormControl>
+    <Modal isOpen={isOpen} onClose={resetModal}>
+      <ModalOverlay />
+      <ModalContent>
+        <ModalHeader>Ajouter un patient</ModalHeader>
+        <ModalCloseButton />
+        <ModalBody pb={6}>
+          <FormControl isRequired isInvalid={formErrors.nom}>
+            <FormLabel>Nom</FormLabel>
+            <Input placeholder="Nom" name="nom" value={formData.nom} onChange={handleChange} />
+          </FormControl>
 
-            <FormControl mt={4} isRequired isInvalid={formErrors.prenom}>
-              <FormLabel>Prénom</FormLabel>
-              <Input placeholder="Prénom" name="prenom" value={formData.lastName} onChange={handleChange} />
-            </FormControl>
+          <FormControl mt={4} isRequired isInvalid={formErrors.prenom}>
+            <FormLabel>Prénom</FormLabel>
+            <Input placeholder="Prénom" name="prenom" value={formData.prenom} onChange={handleChange} />
+          </FormControl>
 
-            <FormControl mt={4} isRequired isInvalid={formErrors.adresse}>
-              <FormLabel>Adresse</FormLabel>
-              <Input placeholder="Adresse" name="adresse" value={formData.address} onChange={handleChange} />
-            </FormControl>
+          <FormControl mt={4} isRequired isInvalid={formErrors.adresse}>
+            <FormLabel>Adresse</FormLabel>
+            <Input placeholder="Adresse" name="adresse" value={formData.adresse} onChange={handleChange} />
+          </FormControl>
 
-            <FormControl mt={4} isRequired isInvalid={formErrors.profession}>
-              <FormLabel>Profession</FormLabel>
-              <Input placeholder="Profession" name="profession" value={formData.profession} onChange={handleChange} />
-            </FormControl>
+          <FormControl mt={4} isRequired isInvalid={formErrors.profession}>
+            <FormLabel>Profession</FormLabel>
+            <Input placeholder="Profession" name="profession" value={formData.profession} onChange={handleChange} />
+          </FormControl>
 
-            <FormControl mt={4} isRequired isInvalid={formErrors.dateNaissance}>
-              <FormLabel>Date de naissance</FormLabel>
-              <Input placeholder='Date de naissance' name='dateNaissance' value={formData.dateNaissance}  onChange={handleChange} size='md' type='date' />
-            </FormControl>
+          <FormControl mt={4} isRequired isInvalid={formErrors.dateNaissance}>
+            <FormLabel>Date de naissance</FormLabel>
+            <Input placeholder='Date de naissance' name='dateNaissance' value={formData.dateNaissance} onChange={handleChange} type='date' />
+          </FormControl>
 
-            <FormControl mt={4} isRequired isInvalid={formErrors.sexe}>
-              <FormLabel>Sexe</FormLabel>
-              <Select name="sexe" value={formData.sex} onChange={handleChange}>
-                <option value="">Sélectionner une option</option>
-                <option value="Homme">Homme</option>
-                <option value="Femme">Femme</option>
-                {/* <option value="other">Other</option> */}
-              </Select>
-            </FormControl>
+          <FormControl mt={4} isRequired isInvalid={formErrors.sexe}>
+            <FormLabel>Sexe</FormLabel>
+            <Select name="sexe" value={formData.sexe} onChange={handleChange}>
+              <option value="">Sélectionner une option</option>
+              <option value="Homme">Homme</option>
+              <option value="Femme">Femme</option>
+            </Select>
+          </FormControl>
 
-            <FormControl mt={4} isRequired isInvalid={formErrors.moyenDeConnaissance}>
-              <FormLabel>Comment avez-vous entendu parler de nous ?</FormLabel>
-              <Select name="moyenDeConnaissance" value={formData.referral} onChange={handleChange}>
-                <option value="">Sélectionner une option</option>
-                <option value="Internet">Internet</option>
-                <option value="Ami">Ami(e)</option>
-                <option value="Publicite">Publicité</option>
-                <option value="Autre">Autre</option>
-              </Select>
-            </FormControl>
-          </ModalBody>
+          <FormControl mt={4} isRequired isInvalid={formErrors.moyenDeConnaissance}>
+            <FormLabel>Comment avez-vous entendu parler de nous ?</FormLabel>
+            <Select name="moyenDeConnaissance" value={formData.moyenDeConnaissance} onChange={handleChange}>
+              <option value="">Sélectionner une option</option>
+              <option value="Internet">Internet</option>
+              <option value="Ami">Ami(e)</option>
+              <option value="Publicite">Publicité</option>
+              <option value="Autre">Autre</option>
+            </Select>
+          </FormControl>
+        </ModalBody>
 
-          <ModalFooter>
-            <Button colorScheme="blue" mr={3} onClick={handleSubmit}>
-              Ajouter
-            </Button>
-            <Button onClick={onClose}>Annuler</Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
-    </>
+        <ModalFooter>
+          <Button colorScheme="blue" mr={3} onClick={handleSubmit}>
+            Ajouter
+          </Button>
+          <Button onClick={resetModal}>Annuler</Button>
+        </ModalFooter>
+      </ModalContent>
+    </Modal>
   );
 }
 
 ModalAddPatient.propTypes = {
-    isOpen: PropTypes.bool,
-    onClose: PropTypes.func
+  isOpen: PropTypes.bool,
+  onClose: PropTypes.func
 };
-
 
 export default ModalAddPatient;
