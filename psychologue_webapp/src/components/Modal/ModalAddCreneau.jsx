@@ -106,6 +106,7 @@ function ModalAddCreneau({ isOpen, onClose }) {
         });
         setIsMajor(true);
         setAvailableHours([]);
+        onClose();
     };
 
     function validateForm() {
@@ -158,7 +159,7 @@ function ModalAddCreneau({ isOpen, onClose }) {
             duration: 5000,
             isClosable: true
         });
-        onClose();
+        resetModal();
     }
     
     function handleError(error) {
@@ -183,7 +184,7 @@ function ModalAddCreneau({ isOpen, onClose }) {
     
 
     return (
-        <Modal isOpen={isOpen} onClose={() => (onClose(),resetModal())}>
+        <Modal isOpen={isOpen} onClose={resetModal}>
             <ModalOverlay />
             <ModalContent>
             <ModalHeader>Ajouter un créneau</ModalHeader>
