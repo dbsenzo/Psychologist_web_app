@@ -1,6 +1,6 @@
-# Psychologue Web App
+# Psychologist Web App
 
-Welcome to the GitHub repository for the Psychologue Web App. This application is designed to provide online booking services, enabling users to connect with professional psychologists from the comfort of their homes.
+Welcome to the GitHub repository for the Psychologist Web App. This application is designed to provide online booking services, enabling users to connect with professional psychologists from the comfort of their homes.
 
 ## Features
 
