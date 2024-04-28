@@ -1,35 +1,110 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
 
-function App() {
-  const [count, setCount] = useState(0)
+import { ChakraProvider,Box } from '@chakra-ui/react'
+import { Homepage } from './page/Homepage';
+import theme from './theme';
+import { RouterProvider, createBrowserRouter, Outlet, useNavigate} from 'react-router-dom';
+import { Reserver } from './page/Reserver';
+import { Sidebar } from './components/Navigation/Sidebar';
+import { LoginPage } from './page/Login';
+import AuthContextProvider, { AuthContext } from './context/AuthContext';
+import { useContext, useEffect } from 'react';
+import ProtectedRoute from './components/Navigation/ProtectedRoute';
+import NotFoundPage from './components/Navigation/NotFound';
+import { ClientHomepage } from './page/ClientHomepage';
+import { ClientsProvider } from './context/ClientsContext';
+import ManageAppointments from './page/ManageAppointments';
+
+
+const HeaderLayout = () => {
+  const { user } = useContext(AuthContext);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!user) {
+      navigate('/login');
+    } else if (user.isAdmin && window.location.pathname === '/login') {
+      navigate('/');
+    } else if (!user.isAdmin && window.location.pathname === '/login') {
+      navigate('/account/viewAppointment');
+    }
+  }, [user, navigate]);
 
   return (
     <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+      <Box display="flex" height="100vh">
+        <Box position="fixed" height="100vh" overflowY="auto">
+          <Sidebar />
+        </Box>
+        <Box flex="1" ml="290px" paddingInline="10px" overflowY="auto">
+          <Outlet />
+        </Box>
+      </Box>
     </>
+  )};
+
+
+// Router definition
+const routerAdmin = [
+  {
+    path: '/',
+    element: <HeaderLayout/>,
+    children: [
+      {
+        index: true,
+        element: <ProtectedRoute adminOnly><Homepage/></ProtectedRoute> ,
+      },
+      {
+        path: 'reservation',
+        element: <ProtectedRoute adminOnly><Reserver/></ProtectedRoute>
+      },
+      {
+        path: 'manageAppointments',
+        element: <ProtectedRoute adminOnly><ManageAppointments/></ProtectedRoute>
+      },
+    ]
+  }
+];
+
+const routerPatient = [
+  {
+    path: '/account/viewAppointment',
+    element: <ProtectedRoute><ClientHomepage/></ProtectedRoute>
+  }
+]
+
+const routerError = [
+  {
+    path: '*',
+    element: <NotFoundPage />,
+  }
+]
+
+const routerLogin = [
+  {
+    
+    children: [
+      {
+        path: '/login',
+        element: <LoginPage/>
+      }
+    ]
+  }
+]
+
+const router = createBrowserRouter([...routerAdmin, ...routerPatient, ...routerLogin, ...routerError]);
+
+
+
+const App = () => {
+  return (
+    <ChakraProvider theme={theme}>
+      <AuthContextProvider>
+        <ClientsProvider>
+          <RouterProvider router={router} />
+        </ClientsProvider>
+      </AuthContextProvider>
+    </ChakraProvider>
   )
 }
 
-export default App
+export default App;

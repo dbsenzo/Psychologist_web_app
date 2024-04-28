@@ -57,5 +57,3 @@ For any queries, please open an issue on GitHub.
 #### Acknowledgments
 Thanks to all the psychologists who helped in defining the requirements.
 Special thanks to Samy Bouhamidi for contributions to the project.
-
-
