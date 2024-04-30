@@ -2,10 +2,14 @@ import { createContext, useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import LoginAPI from '../services/LoginAPI'
 import {jwtDecode} from 'jwt-decode';
+import { Toast } from '@chakra-ui/react';
+import { useNotification } from '../services/NotificationService';
+
 export const AuthContext = createContext();
 
 const AuthContextProvider = (props) => {
     const [user, setUser] = useState(null);
+    const { notify } = useNotification();
 
     useEffect(() => {
         const token = localStorage.getItem('token');
@@ -36,6 +40,11 @@ const AuthContextProvider = (props) => {
                 decodeToken(data.token);
             }
         }).catch(error => {
+            notify({
+                title: "Erreur",
+                description: "Nom d'utilisateur/mot de passe incorrects. Veuillez réessayer.",
+                status: "error"
+              });
             console.error('Login failed:', error.message);
             logout(); // Ensure clean state on failure
         });

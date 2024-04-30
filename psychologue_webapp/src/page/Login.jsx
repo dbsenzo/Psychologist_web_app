@@ -38,8 +38,8 @@ export function LoginPage(){
                         <form style={{gap: '10px', display: 'flex', flexDirection: 'column'}}onSubmit={handleLogin}>
                             <Box display={"flex"} flexDirection={"column"} gap={"30px"}>
                                 <Box>
-                                    <Text fontWeight={500}>E-mail</Text>
-                                    <Input placeholder="Votre adresse e-mail" onChange={e => setUsername(e.target.value)}/>
+                                    <Text fontWeight={500}>Nom d'utilisateur</Text>
+                                    <Input placeholder="Votre nom d'utilisateur" onChange={e => setUsername(e.target.value)}/>
                                 </Box>
                                 <Box>
                                     <Text fontWeight={500}>Mot de passe</Text>
@@ -55,7 +55,7 @@ export function LoginPage(){
                                     <Text fontSize={"16px"}>Se souvenir de moi</Text>
                                 </Box>
                                 <Button variant={"secondary"} type="submit">Connexion</Button>
-                                <Text>Acceder au meilleur dashboard ? <Text as={'span'} variant="hoverBlue" color="textColor">Inscription</Text></Text>
+                                {/* <Text>Acceder au meilleur dashboard ? <Text as={'span'} variant="hoverBlue" color="textColor">Inscription</Text></Text> */}
                             </Box>
                         </form>
                     </Box>
